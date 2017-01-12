@@ -158,7 +158,7 @@ def mat(message):
 @listen_to(r'mat\+$')
 def mat_plus(message):
     seconds = 86400 # 24 * 60 * 60
-    tomorrow = datetime.fromtimestamp(time.time() + seconds)
+    tomorrow = datetime.date.fromtimestamp(time.time() + seconds)
     message.reply(u"```IKSU\n{}```".format(get_food(day = str(tomorrow))))
 
 
