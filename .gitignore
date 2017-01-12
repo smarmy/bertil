@@ -87,3 +87,8 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+# vim garbage files
+*~
+*.swp
+*.swo

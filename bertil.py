@@ -98,16 +98,13 @@ def run_service():
         return stdout.decode('utf-8')
 
 
-def get_mat():
+def get_food(day):
     # Get JSON
     URL = 'http://www.hanssonohammar.se/veckansmeny.json'
     response = urllib.urlopen(URL)
     data = json.loads(response.read().decode('utf-8'))
 
-    # Get current date
-    today = str(datetime.date.today())
-
-    if today not in data:
+    if day not in data:
         return "(no mat today)"
 
     mat_today = data[today][0]
@@ -155,7 +152,13 @@ def run(message, code):
 
 @listen_to(r'^mat$')
 def mat(message):
-    message.reply(u"```IKSU\n{}```".format(get_mat()))
+    message.reply(u"```IKSU\n{}```".format(get_food(day = str(datetime.date.today()))))
+
+@listen_to(r'mat\+$')
+def mat_plus(message):
+    seconds = 86400 # 24 * 60 * 60
+    tomorrow = datetime.fromtimestamp(time.time() + seconds)
+    message.reply(u"```IKSU\n{}```".format(get_food(day = str(tomorrow))))
 
 
 @listen_to(r'^ere fredag\?$')
