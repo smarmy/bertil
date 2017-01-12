@@ -5,6 +5,7 @@ import sys
 import logging
 import os.path
 import datetime
+import time
 import urllib
 import json
 import codecs
@@ -105,9 +106,9 @@ def get_food(day):
     data = json.loads(response.read().decode('utf-8'))
 
     if day not in data:
-        return "(no mat today)"
+        return "(no mat " + str(day) + ")"
 
-    mat_today = data[today][0]
+    mat_today = data[day][0]
 
     if 'IKSU' not in mat_today:
         return "(no IKSU today)"
