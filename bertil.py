@@ -151,15 +151,10 @@ def run(message, code):
         ios_lock.release()
 
 
-@listen_to(r'^mat$')
-def mat(message):
-    message.reply(u"```IKSU\n{}```".format(get_food(day = str(datetime.date.today()))))
-
-@listen_to(r'mat([\+]+)$')
-def mat_plus(message, plus):
-    seconds = 86400 * len(plus) # 24 * 60 * 60
-    tomorrow = datetime.date.fromtimestamp(time.time() + seconds)
-    message.reply(u"```IKSU\n{}```".format(get_food(day = str(tomorrow))))
+@listen_to(r'mat(\+*)$')
+def mat(message, plus):
+    date = datetime.date.fromtimestamp(time.time() + (86400 * len(plus)))
+    message.reply(u"```IKSU - {}\n{}```".format(str(date), get_food(str(date))))
 
 
 @listen_to(r'^ere fredag\?$')
