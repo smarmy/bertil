@@ -155,9 +155,9 @@ def run(message, code):
 def mat(message):
     message.reply(u"```IKSU\n{}```".format(get_food(day = str(datetime.date.today()))))
 
-@listen_to(r'mat\+$')
-def mat_plus(message):
-    seconds = 86400 # 24 * 60 * 60
+@listen_to(r'mat([\+]+)$')
+def mat_plus(message, plus):
+    seconds = 86400 * len(plus) # 24 * 60 * 60
     tomorrow = datetime.date.fromtimestamp(time.time() + seconds)
     message.reply(u"```IKSU\n{}```".format(get_food(day = str(tomorrow))))
 
