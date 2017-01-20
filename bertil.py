@@ -151,7 +151,7 @@ def run(message, code):
         ios_lock.release()
 
 
-@listen_to(r'mat(\+*)$')
+@listen_to(r'^mat(\+*)$')
 def mat(message, plus):
     date = datetime.date.fromtimestamp(time.time() + (86400 * len(plus)))
     message.reply(u"```IKSU - {}\n{}```".format(str(date), get_food(str(date))))
