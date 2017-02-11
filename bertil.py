@@ -9,6 +9,7 @@ import time
 import urllib
 import json
 import codecs
+import socket
 from HTMLParser import HTMLParser
 from subprocess import Popen, PIPE
 from slackbot.bot import Bot, listen_to, respond_to
@@ -163,6 +164,16 @@ def fredag(message):
         message.reply(u"JA")
     else:
         message.reply(u"NEJ")
+
+
+@listen_to(r'^temp$')
+def temp(message):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect(('temp.acc.umu.se', 2345))
+    tmp = s.recv(1024)
+    s.close()
+    time, temp = tmp[:len(tmp) - 1].split('=')
+    message.reply(u"{} C klockan {}".format(temp, time))
 
 
 def main():
