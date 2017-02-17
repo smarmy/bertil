@@ -7,7 +7,12 @@ import urllib
 import json
 import socket
 import re
+import random
 from slackbot.bot import Bot, listen_to, respond_to
+from tinydb import TinyDB
+
+
+db = TinyDB('quotes.json')
 
 
 def get_food(day):
@@ -65,6 +70,22 @@ def temp(message, plus):
         s.close()
         time, temp = tmp[:len(tmp) - 1].split('=')
         message.reply(u"{} C klockan {}".format(temp, time))
+
+
+@listen_to(r'^quote add (.*)$')
+def quote_add(message, quote):
+    db.insert({'quote': quote})
+    message.reply(u"Quote inlagd!")
+
+
+@listen_to(r'^quote$')
+def quote(message):
+    quotes = db.all()
+    if len(quotes) == 0:
+        message.reply(u"Inga quotes inlagda...")
+    else:
+        quote = random.choice(quotes)
+        message.reply(u">{}".format(quote['quote']))
 
 
 def main():
