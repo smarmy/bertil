@@ -54,14 +54,17 @@ def fredag(message):
         message.reply(u"Nej, idag är det INTE fredag! :qq::gun:")
 
 
-@listen_to(r'^temp', re.IGNORECASE)
-def temp(message):
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect(('temp.acc.umu.se', 2345))
-    tmp = s.recv(1024)
-    s.close()
-    time, temp = tmp[:len(tmp) - 1].split('=')
-    message.reply(u"{} C klockan {}".format(temp, time))
+@listen_to(r'^temp(\+*)$')
+def temp(message, plus):
+    if len(plus) > 0:
+        message.reply(u"Jag kan inte se in i framtiden... :qq::gun:")
+    else:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect(('temp.acc.umu.se', 2345))
+        tmp = s.recv(1024)
+        s.close()
+        time, temp = tmp[:len(tmp) - 1].split('=')
+        message.reply(u"{} C klockan {}".format(temp, time))
 
 
 def main():
