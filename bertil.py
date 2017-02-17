@@ -10,6 +10,7 @@ import urllib
 import json
 import codecs
 import socket
+import re
 from HTMLParser import HTMLParser
 from subprocess import Popen, PIPE
 from slackbot.bot import Bot, listen_to, respond_to
@@ -161,15 +162,15 @@ def mat(message, plus):
         message.reply("Kom inte åt maten 😞 ({what})".format(what=e.message))
 
 
-@listen_to(r'^ere fredag\?$')
+@listen_to(ur'^[e\u00E4\u00C4]r.*fredag.*\?', re.IGNORECASE)
 def fredag(message):
     if datetime.datetime.today().weekday() == 4:
-        message.reply(u"JA")
+        message.reply(u"Japp, idag är det fredag! :kreygasm:")
     else:
-        message.reply(u"NEJ")
+        message.reply(u"Nej, idag är det INTE fredag! :qq::gun:")
 
 
-@listen_to(r'^temp$')
+@listen_to(r'^temp', re.IGNORECASE)
 def temp(message):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect(('temp.acc.umu.se', 2345))
