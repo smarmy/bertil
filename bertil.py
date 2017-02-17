@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import sys
-import logging
 import datetime
 import time
 import urllib
@@ -66,13 +65,6 @@ def temp(message):
 
 
 def main():
-    kw = {
-            'format': '[%(asctime)s] %(message)s',
-            'datefmt': '%m/%d/%Y %H:%M:%S',
-            'level': logging.DEBUG,
-            'stream': sys.stdout,
-            }
-    logging.basicConfig(**kw)
     bot = Bot()
     bot.run()
 
