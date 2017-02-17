@@ -12,7 +12,7 @@ from slackbot.bot import Bot, listen_to, respond_to
 from tinydb import TinyDB
 
 
-db = TinyDB('quotes.json')
+db = TinyDB('/home/simon/bertil/quotes.json')
 
 
 def get_food(day):
