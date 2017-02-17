@@ -154,7 +154,10 @@ def run(message, code):
 @listen_to(r'^mat(\+*)$')
 def mat(message, plus):
     date = datetime.date.fromtimestamp(time.time() + (86400 * len(plus)))
-    message.reply(u"```IKSU - {}\n{}```".format(str(date), get_food(str(date))))
+    try:
+        message.reply(u"```IKSU - {}\n{}```".format(str(date), get_food(str(date))))
+    except Exception as e:
+        message.reply("Kom inte åt maten 😞 ({what})".format(what=e.message))
 
 
 @listen_to(r'^ere fredag\?$')
