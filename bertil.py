@@ -85,7 +85,7 @@ def quote(message):
         message.reply(u"Inga quotes inlagda...")
     else:
         quote = random.choice(quotes)
-        message.reply(u">{}".format(quote['quote']))
+        message.reply(u"{}".format(quote['quote']))
 
 
 def main():
