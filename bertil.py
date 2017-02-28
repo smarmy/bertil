@@ -98,7 +98,7 @@ def quote_find(message, quote_regex):
             message.reply(u"Hittade det här:\n```{quotes}```".format(quotes='\n'.join(quotes)))
         else:
             message.reply(u"Hittade inget :-(")
-    except e:
+    except Exception as e:
         message.reply(u"Vad sysslar du med?! ({err})".format(err=e.message))
 
 @listen_to(r'^quote$')
