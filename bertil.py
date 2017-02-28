@@ -77,6 +77,7 @@ def quote_add(message, quote):
     db.insert({'quote': quote})
     message.reply(u"Quote inlagd!")
 
+
 @listen_to(r'^quote remove (.*)$')
 def quote_remove(message, quote):
     Quote = Query()
@@ -86,17 +87,17 @@ def quote_remove(message, quote):
     else:
         message.reply("?")
 
+
 @listen_to(r'^quote find (.*)$')
 def quote_find(message, quote_regex):
     Quote = Query()
     stuff = db.search(Quote.quote.search(quote_regex))
-    quotes = []
-    for s in stuff:
-        quotes.append(s['quote'])
-    if len(stuff) > 0:
-        message.reply(u"Hittade det här:```{quotes}```".format(quotes='\n'.join(quotes)))
+    quotes = [ s['quote'] for s in stuff ]
+    if len(quotes) > 0:
+        message.reply(u"Hittade det här:\n```{quotes}```".format(quotes='\n'.join(quotes)))
     else:
-        message.reply(u"?")
+        message.reply(u"Hittade inget :-(")
+
 
 @listen_to(r'^quote$')
 def quote(message):
@@ -105,7 +106,7 @@ def quote(message):
         message.reply(u"Inga quotes inlagda...")
     else:
         quote = random.choice(quotes)
-        message.reply(u"{}".format(quote['quote']))
+        message.reply(u"```{}```".format(quote['quote']))
 
 
 def main():
