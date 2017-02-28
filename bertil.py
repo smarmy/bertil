@@ -90,14 +90,16 @@ def quote_remove(message, quote):
 
 @listen_to(r'^quote find (.*)$')
 def quote_find(message, quote_regex):
-    Quote = Query()
-    stuff = db.search(Quote.quote.search(quote_regex))
-    quotes = [ s['quote'] for s in stuff ]
-    if len(quotes) > 0:
-        message.reply(u"Hittade det här:\n```{quotes}```".format(quotes='\n'.join(quotes)))
-    else:
-        message.reply(u"Hittade inget :-(")
-
+    try:
+        Quote = Query()
+        stuff = db.search(Quote.quote.search(quote_regex))
+        quotes = [ s['quote'] for s in stuff ]
+        if len(quotes) > 0:
+            message.reply(u"Hittade det här:\n```{quotes}```".format(quotes='\n'.join(quotes)))
+        else:
+            message.reply(u"Hittade inget :-(")
+    except e:
+        message.reply(u"Vad sysslar du med?! ({err})".format(err=e.message))
 
 @listen_to(r'^quote$')
 def quote(message):
