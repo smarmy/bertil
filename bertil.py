@@ -9,7 +9,7 @@ import socket
 import re
 import random
 from slackbot.bot import Bot, listen_to, respond_to
-from tinydb import TinyDB
+from tinydb import TinyDB, Query
 
 
 db = TinyDB('/home/simon/bertil/quotes.json')
@@ -77,6 +77,23 @@ def quote_add(message, quote):
     db.insert({'quote': quote})
     message.reply(u"Quote inlagd!")
 
+@listen_to(r'^quote remove (.*)$')
+def quote_remove(message, quote):
+    Quote = Query()
+    if len(db.search(Quote.quote == quote)) > 0:
+        db.remove(Query.quote == quote)
+        message.reply(u"Tog bort {quote}.".format(quote=quote))
+    else:
+        message.reply("?")
+
+@listen_to(r'^quote find (.*)$')
+def quote_find(message, quote_regex):
+    Quote = Query()
+    stuff = db.search(Quote.quote.matches(quote_regex))
+    if len(stuff) > 0:
+        message.reply(u"Hittade det här:```{quotes}```".format(quotes='\n'.join(stuff)))
+    else:
+        message.reply(u"?")
 
 @listen_to(r'^quote$')
 def quote(message):
