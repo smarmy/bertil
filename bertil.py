@@ -81,7 +81,7 @@ def quote_add(message, quote):
 def quote_remove(message, quote):
     Quote = Query()
     if len(db.search(Quote.quote == quote)) > 0:
-        db.remove(Query.quote == quote)
+        db.remove(Quote.quote == quote)
         message.reply(u"Tog bort {quote}.".format(quote=quote))
     else:
         message.reply("?")
