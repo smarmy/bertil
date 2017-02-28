@@ -101,6 +101,7 @@ def quote_find(message, quote_regex):
     except Exception as e:
         message.reply(u"Vad sysslar du med?! ({err})".format(err=e.message))
 
+
 @listen_to(r'^quote$')
 def quote(message):
     quotes = db.all()
