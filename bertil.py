@@ -50,6 +50,14 @@ def mat(message, plus):
     except Exception as e:
         message.reply(u"Kom inte åt maten 😞 ({what})".format(what=e.message))
 
+@listen_to(ur'^[e\u00E4\u00C4]r.*m\u00E5ndag.*\?', re.IGNORECASE)
+def mondag(message):
+    if datetime.datetime.today().weekday() == 4:
+        message.reply(u"Nä det är fredag! :kreygasm:")
+    elif datetime.datetime.today().weekday() == 0:
+        message.reply(u":joy::gun:")
+    else:
+        message.reply(u"Nä")
 
 @listen_to(ur'^[e\u00E4\u00C4]r.*fredag.*\?', re.IGNORECASE)
 def fredag(message):
