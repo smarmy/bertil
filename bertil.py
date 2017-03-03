@@ -68,7 +68,7 @@ def fredag(message):
 
 
 @listen_to(r'^temp$')
-def temp(message, plus):
+def temp(message):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect(('temp.acc.umu.se', 2345))
     tmp = s.recv(1024)
