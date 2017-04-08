@@ -32,14 +32,16 @@ def get_food(day):
     return "\n".join(mat_today['IKSU'])
 
 
-@listen_to(r'^compile (.*)$')
-def compile(message, code):
-    message.reply(u"Jag klarar inte av sånt längre :'(")
+@listen_to(r'^vecka$')
+def vecka(message):
+    vecka = datetime.datetime.now().isocalendar()[1]
+    message.reply(u"Vecka {}".format(vecka))
 
 
-@listen_to(r'^run (.*)$')
-def run(message, code):
-    message.reply(u"Jag klarar inte av sånt längre :'(")
+@listen_to(r'^datum$')
+def datum(message):
+    datum = datetime.datetime.now().strftime('%Y-%m-%d')
+    message.reply(u"{}".format(datum))
 
 
 @listen_to(r'^mat(\+*)$')
