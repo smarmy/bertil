@@ -8,6 +8,7 @@ import json
 import socket
 import re
 import random
+import requests
 from slackbot.bot import Bot, listen_to, respond_to
 from tinydb import TinyDB, Query
 
@@ -118,6 +119,51 @@ def quote(message):
         quote = random.choice(quotes)
         message.reply(u"```{}```".format(quote['quote']))
 
+@listen_to(r'^stackoverflow (.*)$')
+def stackoverflow(message, query):
+    url = 'https://api.stackexchange.com'
+
+    r = requests.get('{}/2.2/search/advanced?q={}&accepted=True&site=stackoverflow'.format(url, query))
+
+    data = r.json()
+    items = data['items']
+    answers = []
+
+    for item in items:
+        answer_id = item['accepted_answer_id']
+        answers.append(str(answer_id))
+
+    while len(answers) > 100:
+        answers.pop()
+
+    answer_str = ';'.join(answers)
+    r = requests.get('{}/2.2/answers/{}?order=desc&sort=activity&site=stackoverflow&filter=withbody'.format(url, answer_str))
+
+    data = r.json()
+    items = data['items']
+    max_score = 0
+    max_answer = None
+    for item in items:
+        score = item['score']
+        if score > max_score:
+            max_score = score
+            max_answer = item
+
+    body = max_answer['body']
+    body = body.replace('<p>', '')
+    body = body.replace('</p>', '')
+    body = body.replace('<code>', '```')
+    body = body.replace('</code>', '```')
+    body = body.replace('<ul>', '')
+    body = body.replace('</ul>', '')
+    body = body.replace('<li>', '* ')
+    body = body.replace('</li>', '')
+    body = body.replace('<pre>', '')
+    body = body.replace('</pre>', '')
+    body = body.replace('&lt;', '<')
+    body = body.replace('&gt;', '>')
+
+    message.reply(u"{}".format(body))
 
 def main():
     bot = Bot()
