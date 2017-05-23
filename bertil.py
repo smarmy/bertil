@@ -119,7 +119,7 @@ def quote(message):
         quote = random.choice(quotes)
         message.reply(u"```{}```".format(quote['quote']))
 
-@listen_to(r'^stackoverflow (.*)$')
+@listen_to(r'^so (.*)$')
 def stackoverflow(message, query):
     url = 'https://api.stackexchange.com'
 
@@ -162,7 +162,20 @@ def stackoverflow(message, query):
     body = body.replace('</pre>', '')
     body = body.replace('&lt;', '<')
     body = body.replace('&gt;', '>')
-
+    body = body.replace('<em>', '*')
+    body = body.replace('</em>', '*')
+    body = body.replace('<strong>', '*')
+    body = body.replace('</strong>', '*')
+    
+    maxLen = 6
+    bodylist = list(filter(lambda x: len(x)>0, body.split('\n')))
+    
+    while len(body.split('\n')) > maxLen:
+        bodylist.pop()
+    bodylist.append('...')
+    body = '\n'.join(bodylist)
+    body += '\n{}'.format(max_answer['link'])
+    
     message.reply(u"{}".format(body))
 
 def main():
