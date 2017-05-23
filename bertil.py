@@ -170,7 +170,7 @@ def stackoverflow(message, query):
     maxLen = 6
     bodylist = list(filter(lambda x: len(x)>0, body.split('\n')))
     
-    while len(body.split('\n')) > maxLen:
+    while len(bodylist) > maxLen:
         bodylist.pop()
     bodylist.append('...')
     body = '\n'.join(bodylist)
