@@ -174,7 +174,7 @@ def stackoverflow(message, query):
         bodylist.pop()
     bodylist.append('...')
     body = '\n'.join(bodylist)
-    body += '\n{}'.format(max_answer['link'])
+    body += '\nhttps://stackoverflow.com/a/{}'.format(max_answer['answer_id'])
     
     message.reply(u"{}".format(body))
 
