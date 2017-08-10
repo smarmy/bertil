@@ -31,14 +31,14 @@ def get_food(day):
 
 @listen_to(r'^vecka$')
 def vecka(message):
-    vecka = datetime.datetime.now().isocalendar()[1]
-    message.reply(u"Vecka {}".format(vecka))
+    week = datetime.datetime.now().isocalendar()[1]
+    message.reply(u"Vecka {}".format(week))
 
 
 @listen_to(r'^datum$')
 def datum(message):
-    datum = datetime.datetime.now().strftime('%Y-%m-%d')
-    message.reply(u"{}".format(datum))
+    date = datetime.datetime.now().strftime('%Y-%m-%d')
+    message.reply(u"{}".format(date))
 
 
 @listen_to(r'^mat(\+*)$')
@@ -87,10 +87,10 @@ def whenhelg(message):
 def temp(message):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect(('temp.acc.umu.se', 2345))
-    tmp = sock.recv(1024)
+    response = sock.recv(1024)
     sock.close()
-    time, temp = tmp[:len(tmp) - 1].split('=')
-    message.reply(u"{} C klockan {}".format(temp, time))
+    current_time, current_temp = response[:len(response) - 1].split('=')
+    message.reply(u"{} C klockan {}".format(current_temp, current_time))
 
 
 @listen_to(r'^quote add (.*)$')
@@ -127,7 +127,7 @@ def quote_find(message, quote_regex):
 
 
 @listen_to(r'^quote$')
-def quote(message):
+def get_random_quote(message):
     tdb = TinyDB('/home/simon/bertil/quotes.json')
     quotes = tdb.all()
     if len(quotes) == 0:
