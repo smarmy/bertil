@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import sys
 import datetime
 import time
 import urllib
@@ -9,7 +8,7 @@ import socket
 import re
 import random
 import requests
-from slackbot.bot import Bot, listen_to, respond_to
+from slackbot.bot import Bot, listen_to
 from tinydb import TinyDB, Query
 
 
@@ -187,10 +186,9 @@ def stackoverflow(message, query):
     body = body.replace('<strong>', '*')
     body = body.replace('</strong>', '*')
 
-    max_len = 6
-    bodylist = list(filter(lambda x: len(x)>0, body.split('\n')))
+    bodylist = list(filter(lambda x: len(x) > 0, body.split('\n')))
 
-    while len(bodylist) > max_len:
+    while len(bodylist) > 6:
         bodylist.pop()
     bodylist.append('...')
     body = '\n'.join(bodylist)
