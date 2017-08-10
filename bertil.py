@@ -75,7 +75,7 @@ def whenhelg(message):
     if today.weekday() == 5 or today.weekday() == 6:
         message.reply(u"Det är ju redan helg din knasboll! :kreygasm:")
     else:
-        weekend = today.replace(hour = 17, minute = 0, second = 0)
+        weekend = today.replace(hour=17, minute=0, second=0)
         while weekend.weekday() < 4:
             weekend += datetime.timedelta(1)
 
