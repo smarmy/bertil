@@ -186,11 +186,12 @@ def stackoverflow(message, query):
     body = body.replace('<strong>', '*')
     body = body.replace('</strong>', '*')
 
-    bodylist = list(filter(lambda x: len(x) > 0, body.split('\n')))
+    bodylist = [body for body in body.split('\n') if body]
 
     while len(bodylist) > 6:
         bodylist.pop()
     bodylist.append('...')
+
     body = '\n'.join(bodylist)
     body += '\nhttps://stackoverflow.com/a/{}'.format(max_answer['answer_id'])
 
