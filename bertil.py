@@ -69,20 +69,23 @@ def fredag(message):
     else:
         message.reply(u"Nej, idag är det INTE fredag! :qq::gun:")
 
-@listen_to(ur'^n[\u00E4\u00C4]r.*fredag.*\?', re.IGNORECASE)
-def whenfredag(message):
+@listen_to(ur'^n[\u00E4\u00C4]r.*helg.*\?', re.IGNORECASE)
+def whenhelg(message):
     today = datetime.datetime.now()
-    weekend = today.replace(hour = 17, minute = 0, second = 0)
-    while(weekend.weekday() < 4):
-      weekend += datetime.timedelta(1)
+    if today.weekday() == 5 or today.weekday() == 6:
+      message.reply(u"Det är ju redan helg din knasboll! :kreygasm:")
+    else:
+      weekend = today.replace(hour = 17, minute = 0, second = 0)
+      while weekend.weekday() < 4:
+        weekend += datetime.timedelta(1)
 
-    diff = weekend - today
+      diff = weekend - today
 
-    deltaDays = diff.days
-    deltaHours = diff.seconds / 3600
-    deltaMinutes = (diff.seconds - deltaHours * 3600) / 60
-    deltaSeconds = diff.seconds - (deltaHours * 3600) - (deltaMinutes * 60)
-    message.reply(u"Det är {days} dagar {hours} timmar {minutes} minuter och {seconds} sekunder kvar...:(".format(days=deltaDays, hours=deltaHours, minutes=deltaMinutes, seconds=deltaSeconds))
+      deltaDays = diff.days
+      deltaHours = diff.seconds / 3600
+      deltaMinutes = (diff.seconds - deltaHours * 3600) / 60
+      deltaSeconds = diff.seconds - (deltaHours * 3600) - (deltaMinutes * 60)
+      message.reply(u"Det är {days} dagar {hours} timmar {minutes} minuter och {seconds} sekunder kvar...:disappointed:".format(days=deltaDays, hours=deltaHours, minutes=deltaMinutes, seconds=deltaSeconds))
 
 @listen_to(r'^temp$')
 def temp(message):
