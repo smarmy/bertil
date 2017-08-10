@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import sys
 import datetime
 import time
 import urllib
@@ -9,7 +8,7 @@ import socket
 import re
 import random
 import requests
-from slackbot.bot import Bot, listen_to, respond_to
+from slackbot.bot import Bot, listen_to
 from tinydb import TinyDB, Query
 
 
@@ -81,7 +80,9 @@ def whenhelg(message):
         hours = diff.seconds / 3600
         minutes = (diff.seconds - hours * 3600) / 60
         seconds = diff.seconds - (hours * 3600) - (minutes * 60)
-        message.reply(u"Det är {days} dagar {hours} timmar {minutes} minuter och {seconds} sekunder kvar...:disappointed:".format(days=days, hours=hours, minutes=minutes, seconds=seconds))
+        message.reply(u"Det är {days} dagar {hours} timmar {minutes} minuter och {seconds} " \
+                       "sekunder kvar... :disappointed:".format(days=days, hours=hours,
+                                                                minutes=minutes, seconds=seconds))
 
 @listen_to(r'^temp$')
 def temp(message):
@@ -104,7 +105,7 @@ def quote_add(message, quote):
 def quote_remove(message, quote):
     tdb = TinyDB('/home/simon/bertil/quotes.json')
     query = Query()
-    if len(tdb.search(query.quote == quote)) > 0:
+    if tdb.search(query.quote == quote):
         tdb.remove(query.quote == quote)
         message.reply(u"Tog bort {quote}.".format(quote=quote))
     else:
@@ -117,8 +118,8 @@ def quote_find(message, quote_regex):
     try:
         query = Query()
         stuff = tdb.search(query.quote.search(quote_regex))
-        quotes = [ s['quote'] for s in stuff ]
-        if len(quotes) > 0:
+        quotes = [s['quote'] for s in stuff]
+        if quotes:
             message.reply(u"Hittade det här:\n```{quotes}```".format(quotes='\n'.join(quotes)))
         else:
             message.reply(u"Hittade inget :-(")
@@ -130,7 +131,7 @@ def quote_find(message, quote_regex):
 def get_random_quote(message):
     tdb = TinyDB('/home/simon/bertil/quotes.json')
     quotes = tdb.all()
-    if len(quotes) == 0:
+    if not quotes:
         message.reply(u"Inga quotes inlagda...")
     else:
         quote = random.choice(quotes)
@@ -139,7 +140,9 @@ def get_random_quote(message):
 @listen_to(r'^so (.*)$')
 def stackoverflow(message, query):
     url = 'https://api.stackexchange.com'
-    response = requests.get('{}/2.2/search/advanced?q={}&accepted=True&site=stackoverflow'.format(url, query))
+
+    response = requests.get('{}/2.2/search/advanced?q={}&accepted=True' \
+                            '&site=stackoverflow'.format(url, query))
     data = response.json()
     items = data['items']
     answers = []
@@ -152,7 +155,8 @@ def stackoverflow(message, query):
         answers.pop()
 
     answer_str = ';'.join(answers)
-    response = requests.get('{}/2.2/answers/{}?order=desc&sort=activity&site=stackoverflow&filter=withbody'.format(url, answer_str))
+    response = requests.get('{}/2.2/answers/{}?order=desc&sort=activity' \
+                            '&site=stackoverflow&filter=withbody'.format(url, answer_str))
 
     data = response.json()
     items = data['items']
@@ -182,12 +186,12 @@ def stackoverflow(message, query):
     body = body.replace('<strong>', '*')
     body = body.replace('</strong>', '*')
 
-    max_len = 6
-    bodylist = list(filter(lambda x: len(x)>0, body.split('\n')))
+    bodylist = [body for body in body.split('\n') if body]
 
-    while len(bodylist) > max_len:
+    while len(bodylist) > 6:
         bodylist.pop()
     bodylist.append('...')
+
     body = '\n'.join(bodylist)
     body += '\nhttps://stackoverflow.com/a/{}'.format(max_answer['answer_id'])
 
