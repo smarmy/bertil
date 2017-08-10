@@ -13,9 +13,6 @@ from slackbot.bot import Bot, listen_to, respond_to
 from tinydb import TinyDB, Query
 
 
-db = TinyDB('/home/simon/bertil/quotes.json')
-
-
 def get_food(day):
     # Get JSON
     URL = 'http://www.hanssonohammar.se/veckansmeny.json'
@@ -99,12 +96,14 @@ def temp(message):
 
 @listen_to(r'^quote add (.*)$')
 def quote_add(message, quote):
+    db = TinyDB('/home/simon/bertil/quotes.json')
     db.insert({'quote': quote})
     message.reply(u"Quote inlagd!")
 
 
 @listen_to(r'^quote remove (.*)$')
 def quote_remove(message, quote):
+    db = TinyDB('/home/simon/bertil/quotes.json')
     Quote = Query()
     if len(db.search(Quote.quote == quote)) > 0:
         db.remove(Quote.quote == quote)
@@ -115,6 +114,7 @@ def quote_remove(message, quote):
 
 @listen_to(r'^quote find (.*)$')
 def quote_find(message, quote_regex):
+    db = TinyDB('/home/simon/bertil/quotes.json')
     try:
         Quote = Query()
         stuff = db.search(Quote.quote.search(quote_regex))
@@ -129,6 +129,7 @@ def quote_find(message, quote_regex):
 
 @listen_to(r'^quote$')
 def quote(message):
+    db = TinyDB('/home/simon/bertil/quotes.json')
     quotes = db.all()
     if len(quotes) == 0:
         message.reply(u"Inga quotes inlagda...")
