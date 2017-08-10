@@ -81,7 +81,9 @@ def whenhelg(message):
         hours = diff.seconds / 3600
         minutes = (diff.seconds - hours * 3600) / 60
         seconds = diff.seconds - (hours * 3600) - (minutes * 60)
-        message.reply(u"Det är {days} dagar {hours} timmar {minutes} minuter och {seconds} sekunder kvar...:disappointed:".format(days=days, hours=hours, minutes=minutes, seconds=seconds))
+        message.reply(u"Det är {days} dagar {hours} timmar {minutes} minuter och {seconds} " \
+                       "sekunder kvar... :disappointed:".format(days=days, hours=hours,
+                                                                minutes=minutes, seconds=seconds))
 
 @listen_to(r'^temp$')
 def temp(message):
@@ -117,7 +119,7 @@ def quote_find(message, quote_regex):
     try:
         query = Query()
         stuff = tdb.search(query.quote.search(quote_regex))
-        quotes = [ s['quote'] for s in stuff ]
+        quotes = [s['quote'] for s in stuff]
         if len(quotes) > 0:
             message.reply(u"Hittade det här:\n```{quotes}```".format(quotes='\n'.join(quotes)))
         else:
@@ -139,7 +141,9 @@ def get_random_quote(message):
 @listen_to(r'^so (.*)$')
 def stackoverflow(message, query):
     url = 'https://api.stackexchange.com'
-    response = requests.get('{}/2.2/search/advanced?q={}&accepted=True&site=stackoverflow'.format(url, query))
+
+    response = requests.get('{}/2.2/search/advanced?q={}&accepted=True' \
+                            '&site=stackoverflow'.format(url, query))
     data = response.json()
     items = data['items']
     answers = []
@@ -152,7 +156,8 @@ def stackoverflow(message, query):
         answers.pop()
 
     answer_str = ';'.join(answers)
-    response = requests.get('{}/2.2/answers/{}?order=desc&sort=activity&site=stackoverflow&filter=withbody'.format(url, answer_str))
+    response = requests.get('{}/2.2/answers/{}?order=desc&sort=activity' \
+                            '&site=stackoverflow&filter=withbody'.format(url, answer_str))
 
     data = response.json()
     items = data['items']
