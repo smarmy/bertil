@@ -15,8 +15,7 @@ from tinydb import TinyDB, Query
 
 def get_food(day):
     # Get JSON
-    URL = 'http://www.hanssonohammar.se/veckansmeny.json'
-    response = urllib.urlopen(URL)
+    response = urllib.urlopen('http://www.hanssonohammar.se/veckansmeny.json')
     data = json.loads(response.read().decode('utf-8'))
 
     if day not in data:
@@ -47,8 +46,8 @@ def mat(message, plus):
     date = datetime.date.fromtimestamp(time.time() + (86400 * len(plus)))
     try:
         message.reply(u"```IKSU - {}\n{}```".format(str(date), get_food(str(date))))
-    except Exception as e:
-        message.reply(u"Kom inte åt maten 😞 ({what})".format(what=e.message))
+    except Exception as exception:
+        message.reply(u"Kom inte åt maten 😞 ({what})".format(what=exception.message))
 
 @listen_to(ur'^[e\u00E4\u00C4]r.*m\u00E5ndag.*\?', re.IGNORECASE)
 def mondag(message):
@@ -78,35 +77,35 @@ def whenhelg(message):
 
         diff = weekend - today
 
-        deltaDays = diff.days
-        deltaHours = diff.seconds / 3600
-        deltaMinutes = (diff.seconds - deltaHours * 3600) / 60
-        deltaSeconds = diff.seconds - (deltaHours * 3600) - (deltaMinutes * 60)
-        message.reply(u"Det är {days} dagar {hours} timmar {minutes} minuter och {seconds} sekunder kvar...:disappointed:".format(days=deltaDays, hours=deltaHours, minutes=deltaMinutes, seconds=deltaSeconds))
+        days = diff.days
+        hours = diff.seconds / 3600
+        minutes = (diff.seconds - hours * 3600) / 60
+        seconds = diff.seconds - (hours * 3600) - (minutes * 60)
+        message.reply(u"Det är {days} dagar {hours} timmar {minutes} minuter och {seconds} sekunder kvar...:disappointed:".format(days=days, hours=hours, minutes=minutes, seconds=seconds))
 
 @listen_to(r'^temp$')
 def temp(message):
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect(('temp.acc.umu.se', 2345))
-    tmp = s.recv(1024)
-    s.close()
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect(('temp.acc.umu.se', 2345))
+    tmp = sock.recv(1024)
+    sock.close()
     time, temp = tmp[:len(tmp) - 1].split('=')
     message.reply(u"{} C klockan {}".format(temp, time))
 
 
 @listen_to(r'^quote add (.*)$')
 def quote_add(message, quote):
-    db = TinyDB('/home/simon/bertil/quotes.json')
-    db.insert({'quote': quote})
+    tdb = TinyDB('/home/simon/bertil/quotes.json')
+    tdb.insert({'quote': quote})
     message.reply(u"Quote inlagd!")
 
 
 @listen_to(r'^quote remove (.*)$')
 def quote_remove(message, quote):
-    db = TinyDB('/home/simon/bertil/quotes.json')
-    Quote = Query()
-    if len(db.search(Quote.quote == quote)) > 0:
-        db.remove(Quote.quote == quote)
+    tdb = TinyDB('/home/simon/bertil/quotes.json')
+    query = Query()
+    if len(tdb.search(query.quote == quote)) > 0:
+        tdb.remove(query.quote == quote)
         message.reply(u"Tog bort {quote}.".format(quote=quote))
     else:
         message.reply("?")
@@ -114,23 +113,23 @@ def quote_remove(message, quote):
 
 @listen_to(r'^quote find (.*)$')
 def quote_find(message, quote_regex):
-    db = TinyDB('/home/simon/bertil/quotes.json')
+    tdb = TinyDB('/home/simon/bertil/quotes.json')
     try:
-        Quote = Query()
-        stuff = db.search(Quote.quote.search(quote_regex))
+        query = Query()
+        stuff = tdb.search(query.quote.search(quote_regex))
         quotes = [ s['quote'] for s in stuff ]
         if len(quotes) > 0:
             message.reply(u"Hittade det här:\n```{quotes}```".format(quotes='\n'.join(quotes)))
         else:
             message.reply(u"Hittade inget :-(")
-    except Exception as e:
-        message.reply(u"Vad sysslar du med?! ({err})".format(err=e.message))
+    except Exception as exception:
+        message.reply(u"Vad sysslar du med?! ({err})".format(err=exception.message))
 
 
 @listen_to(r'^quote$')
 def quote(message):
-    db = TinyDB('/home/simon/bertil/quotes.json')
-    quotes = db.all()
+    tdb = TinyDB('/home/simon/bertil/quotes.json')
+    quotes = tdb.all()
     if len(quotes) == 0:
         message.reply(u"Inga quotes inlagda...")
     else:
@@ -140,10 +139,8 @@ def quote(message):
 @listen_to(r'^so (.*)$')
 def stackoverflow(message, query):
     url = 'https://api.stackexchange.com'
-
-    r = requests.get('{}/2.2/search/advanced?q={}&accepted=True&site=stackoverflow'.format(url, query))
-
-    data = r.json()
+    response = requests.get('{}/2.2/search/advanced?q={}&accepted=True&site=stackoverflow'.format(url, query))
+    data = response.json()
     items = data['items']
     answers = []
 
@@ -155,7 +152,7 @@ def stackoverflow(message, query):
         answers.pop()
 
     answer_str = ';'.join(answers)
-    r = requests.get('{}/2.2/answers/{}?order=desc&sort=activity&site=stackoverflow&filter=withbody'.format(url, answer_str))
+    response = requests.get('{}/2.2/answers/{}?order=desc&sort=activity&site=stackoverflow&filter=withbody'.format(url, answer_str))
 
     data = r.json()
     items = data['items']
@@ -184,16 +181,16 @@ def stackoverflow(message, query):
     body = body.replace('</em>', '*')
     body = body.replace('<strong>', '*')
     body = body.replace('</strong>', '*')
-    
-    maxLen = 6
+
+    max_len = 6
     bodylist = list(filter(lambda x: len(x)>0, body.split('\n')))
-    
-    while len(bodylist) > maxLen:
+
+    while len(bodylist) > max_len:
         bodylist.pop()
     bodylist.append('...')
     body = '\n'.join(bodylist)
     body += '\nhttps://stackoverflow.com/a/{}'.format(max_answer['answer_id'])
-    
+
     message.reply(u"{}".format(body))
 
 def main():
