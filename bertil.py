@@ -105,7 +105,7 @@ def quote_add(message, quote):
 def quote_remove(message, quote):
     tdb = TinyDB('/home/simon/bertil/quotes.json')
     query = Query()
-    if len(tdb.search(query.quote == quote)) > 0:
+    if tdb.search(query.quote == quote):
         tdb.remove(query.quote == quote)
         message.reply(u"Tog bort {quote}.".format(quote=quote))
     else:
@@ -119,7 +119,7 @@ def quote_find(message, quote_regex):
         query = Query()
         stuff = tdb.search(query.quote.search(quote_regex))
         quotes = [s['quote'] for s in stuff]
-        if len(quotes) > 0:
+        if quotes:
             message.reply(u"Hittade det här:\n```{quotes}```".format(quotes='\n'.join(quotes)))
         else:
             message.reply(u"Hittade inget :-(")
@@ -131,7 +131,7 @@ def quote_find(message, quote_regex):
 def get_random_quote(message):
     tdb = TinyDB('/home/simon/bertil/quotes.json')
     quotes = tdb.all()
-    if len(quotes) == 0:
+    if not quotes:
         message.reply(u"Inga quotes inlagda...")
     else:
         quote = random.choice(quotes)
