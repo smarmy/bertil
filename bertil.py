@@ -154,7 +154,7 @@ def stackoverflow(message, query):
     answer_str = ';'.join(answers)
     response = requests.get('{}/2.2/answers/{}?order=desc&sort=activity&site=stackoverflow&filter=withbody'.format(url, answer_str))
 
-    data = r.json()
+    data = response.json()
     items = data['items']
     max_score = 0
     max_answer = None
