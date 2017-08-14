@@ -67,7 +67,7 @@ def fredag(message):
 @listen_to(ur'^n[\u00E4\u00C4]r.*helg.*\?', re.IGNORECASE)
 def whenhelg(message):
     today = datetime.datetime.now()
-    if today.weekday() == 5 or today.weekday() == 6:
+    if today.weekday() > 4 or (today.weekday() == 4 and today.hour >= 17):
         message.reply(u"Det är ju redan helg din knasboll! :kreygasm:")
     else:
         weekend = today.replace(hour=17, minute=0, second=0)
