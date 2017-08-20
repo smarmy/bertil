@@ -27,6 +27,7 @@ def get_food(day):
 
     return "\n".join(mat_today['IKSU'])
 
+
 @listen_to(r'^veckans mat$')
 def veckans_mat(message):
     days = [u"Måndag", u"Tisdag", u"Onsdag", u"Torsdag", u"Fredag"]
@@ -62,11 +63,6 @@ def mat(message, plus):
         message.reply(u"Kom inte åt maten 😞 ({what})".format(what=exception.message))
 
 
-@listen_to(r'^fika(\+*)$')
-def fika(message, plus):
-    message.reply(u"Nästa fredag ska `tomas` bjuda på fika! :kappa:")
-
-
 @listen_to(ur'^[e\u00E4\u00C4]r.*m\u00E5ndag.*\?', re.IGNORECASE)
 def mondag(message):
     if datetime.datetime.today().weekday() == 4:
@@ -76,12 +72,14 @@ def mondag(message):
     else:
         message.reply(u"Nä")
 
+
 @listen_to(ur'^[e\u00E4\u00C4]r.*fredag.*\?', re.IGNORECASE)
 def fredag(message):
     if datetime.datetime.today().weekday() == 4:
         message.reply(u"Japp, idag är det fredag! :kreygasm:")
     else:
         message.reply(u"Nej, idag är det INTE fredag! :qq::gun:")
+
 
 @listen_to(ur'^n[\u00E4\u00C4]r.*helg.*\?', re.IGNORECASE)
 def whenhelg(message):
@@ -102,6 +100,7 @@ def whenhelg(message):
         message.reply(u"Det är {days} dagar {hours} timmar {minutes} minuter och {seconds} " \
                        "sekunder kvar... :disappointed:".format(days=days, hours=hours,
                                                                 minutes=minutes, seconds=seconds))
+
 
 @listen_to(r'^temp$')
 def temp(message):
@@ -155,6 +154,7 @@ def get_random_quote(message):
     else:
         quote = random.choice(quotes)
         message.reply(u"```{}```".format(quote['quote']))
+
 
 @listen_to(r'^so (.*)$')
 def stackoverflow(message, query):
@@ -215,6 +215,7 @@ def stackoverflow(message, query):
     body += '\nhttps://stackoverflow.com/a/{}'.format(max_answer['answer_id'])
 
     message.reply(u"{}".format(body))
+
 
 def main():
     bot = Bot()
