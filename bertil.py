@@ -11,12 +11,11 @@ import requests
 from slackbot.bot import Bot, listen_to
 from tinydb import TinyDB, Query
 
-
-def get_food(day):
-    # Get JSON
+def fetch_food_json():
     response = urllib.urlopen('http://www.hanssonohammar.se/veckansmeny.json')
-    data = json.loads(response.read().decode('utf-8'))
+    return json.loads(response.read().decode('utf-8'))
 
+def get_food_from_json(day):
     if day not in data:
         return "(no mat " + str(day) + ")"
 
@@ -27,6 +26,10 @@ def get_food(day):
 
     return "\n".join(mat_today['IKSU'])
 
+def get_food(day):
+    # Get JSON
+    data = fetch_food_json()
+    return get_food_from_json(day)
 
 @listen_to(r'^veckans mat$')
 def veckans_mat(message):
@@ -38,11 +41,13 @@ def veckans_mat(message):
         nextweek = 7 - today
         today = 0
 
+    data = fetch_food_json()
+
     fulltext = u""
     for daynum in range(0, len(days) - today):
         date = datetime.date.fromtimestamp(time.time() + (86400 * nextweek) + (86400 * daynum))
         try:
-            fulltext += u"\n{}\n{}\n".format(days[today+daynum], get_food(str(date)))
+            fulltext += u"\n{}\n{}\n".format(days[today+daynum], get_food_from_json(str(date)))
         except Exception as exception:
             if exception.message:
                 fulltext += u"\n{}\n{}\n".format(days[today+daynum], exception.message)
