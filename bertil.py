@@ -38,7 +38,7 @@ def veckans_mat(message):
             fulltext += "{}\n{}\n".format(days[today+daynum], get_food(str(date)))
         except Exception as exception:
             message.reply(u"Kom inte åt maten 😞 ({what})".format(what=exception.message))
-    message.reply(u"```{}```".format(fulltext)
+    message.reply(u"```{}```".format(fulltext))
 
 
 @listen_to(r'^vecka$')
