@@ -27,6 +27,18 @@ def get_food(day):
 
     return "\n".join(mat_today['IKSU'])
 
+def veckans_mat(r'^veckans mat$'):
+    days = [u"Måndag", u"Tisdag", u"Onsdag", u"Torsdag", u"Fredag"]
+    today = datetime.datetime.today().weekday()
+    fulltext = ""
+    for daynum in range(0, len(days) - today):
+        date = datetime.date.fromtimestamp(time.time() + (86400 * daynum))
+        try:
+            fulltext += "{}\n{}\n".format(days[today+daynum], get_food(str(date)))
+        except Exception as exception:
+            message.reply(u"Kom inte åt maten 😞 ({what})".format(what=exception.message))
+    message.reply(u"```{}```".format(fulltext)
+
 
 @listen_to(r'^vecka$')
 def vecka(message):
