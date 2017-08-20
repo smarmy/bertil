@@ -15,7 +15,7 @@ def fetch_food_json():
     response = urllib.urlopen('http://www.hanssonohammar.se/veckansmeny.json')
     return json.loads(response.read().decode('utf-8'))
 
-def get_food_from_json(day):
+def get_food_from_json(data, day):
     if day not in data:
         return "(no mat " + str(day) + ")"
 
@@ -29,7 +29,7 @@ def get_food_from_json(day):
 def get_food(day):
     # Get JSON
     data = fetch_food_json()
-    return get_food_from_json(day)
+    return get_food_from_json(data, day)
 
 @listen_to(r'^veckans mat$')
 def veckans_mat(message):
@@ -47,7 +47,7 @@ def veckans_mat(message):
     for daynum in range(0, len(days) - today):
         date = datetime.date.fromtimestamp(time.time() + (86400 * nextweek) + (86400 * daynum))
         try:
-            fulltext += u"\n{}\n{}\n".format(days[today+daynum], get_food_from_json(str(date)))
+            fulltext += u"\n{}\n{}\n".format(days[today+daynum], get_food_from_json(data, str(date)))
         except Exception as exception:
             if exception.message:
                 fulltext += u"\n{}\n{}\n".format(days[today+daynum], exception.message)
