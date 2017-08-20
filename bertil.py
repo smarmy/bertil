@@ -32,9 +32,15 @@ def get_food(day):
 def veckans_mat(message):
     days = [u"Måndag", u"Tisdag", u"Onsdag", u"Torsdag", u"Fredag"]
     today = datetime.datetime.today().weekday()
+    nextweek = 0
+
+    if today > 4:
+      nextweek = 7 - today
+      today = 0
+
     fulltext = ""
     for daynum in range(0, len(days) - today):
-        date = datetime.date.fromtimestamp(time.time() + (86400 * daynum))
+        date = datetime.date.fromtimestamp(time.time() + (86400 * nextweek) + (86400 * daynum))
         try:
             fulltext += "{}\n{}\n".format(days[today+daynum], get_food(str(date)))
         except Exception as exception:
