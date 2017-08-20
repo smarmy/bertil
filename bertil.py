@@ -35,17 +35,24 @@ def veckans_mat(message):
     nextweek = 0
 
     if today > 4:
-      nextweek = 7 - today
-      today = 0
+        nextweek = 7 - today
+        today = 0
 
     fulltext = ""
     for daynum in range(0, len(days) - today):
         date = datetime.date.fromtimestamp(time.time() + (86400 * nextweek) + (86400 * daynum))
         try:
-            fulltext += "{}\n{}\n".format(days[today+daynum], get_food(str(date)))
+            fulltext += "\n{}\n{}\n".format(days[today+daynum], get_food(str(date)))
         except Exception as exception:
-            message.reply(u"Kom inte åt maten 😞 ({what})".format(what=exception.message))
-    message.reply(u"```{}```".format(fulltext))
+            if len(exception.message) > 0:
+                fulltext += "\n{}\n{}\n".format(days[today+daynum], exception.message)
+            else:
+                fulltext += "\n{}\n{}\n".format(days[today+daynum], u"Okänt fel")
+
+    if len(fulltext) > 0:
+        message.reply(u"```{}```".format(fulltext))
+    else:
+        message.reply(u"Hittade ingen mat.")
 
 
 @listen_to(r'^vecka$')
