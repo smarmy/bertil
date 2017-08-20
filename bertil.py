@@ -27,7 +27,8 @@ def get_food(day):
 
     return "\n".join(mat_today['IKSU'])
 
-def veckans_mat(r'^veckans mat$'):
+@listen_to(r'^veckans mat$')
+def veckans_mat(message):
     days = [u"Måndag", u"Tisdag", u"Onsdag", u"Torsdag", u"Fredag"]
     today = datetime.datetime.today().weekday()
     fulltext = ""
