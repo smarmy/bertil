@@ -98,6 +98,9 @@ def fredag(message):
     else:
         message.reply(u"Nej, idag är det INTE fredag! :qq::gun:")
 
+@listen_to(ur'^n[\u00E4\u00C4]r.*hem.*\?', re.IGNORECASE)
+def hem(message):
+    message.reply(u"Det är väl bara att gå")
 
 @listen_to(ur'^n[\u00E4\u00C4]r.*helg.*\?', re.IGNORECASE)
 def whenhelg(message):
