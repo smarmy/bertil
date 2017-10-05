@@ -47,7 +47,8 @@ def veckans_mat(message):
     for daynum in range(0, len(days) - today):
         date = datetime.date.fromtimestamp(time.time() + (86400 * nextweek) + (86400 * daynum))
         try:
-            fulltext += u"\n{}\n{}\n".format(days[today+daynum], get_food_from_json(data, str(date)))
+            fulltext += u"\n{}\n{}\n".format(days[today+daynum],
+                                             get_food_from_json(data, str(date)))
         except Exception as exception:
             if exception.message:
                 fulltext += u"\n{}\n{}\n".format(days[today+daynum], exception.message)
