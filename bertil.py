@@ -185,14 +185,17 @@ def stackoverflow(message, query):
     # Search for question and retrieve answer id
     search_url = '{}/2.2/search/advanced?order=desc&sort=votes&accepted=True' \
                  '&site=stackoverflow&q={}'.format(url, query)
-    response = requests.get(search_url)
-    question = response.json()['items'][0]
+    response_json = requests.get(search_url).json()
+    if not response_json['items']:
+        message.reply(u'Inga träffar! :-(')
+        return
+    question = response_json['items'][0]
     answer_id = question['accepted_answer_id']
 
     # Get answer
     answer_url = '{}/2.2/answers/{}?&site=stackoverflow&filter=withbody'.format(url, answer_id)
-    response = requests.get(answer_url)
-    answer = response.json()['items'][0]
+    response_json = requests.get(answer_url).json()
+    answer = response_json['items'][0]
     answer_body = answer['body']
 
     # Only reply with first 6 rows in answer
