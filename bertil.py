@@ -11,9 +11,11 @@ import requests
 from slackbot.bot import Bot, listen_to
 from tinydb import TinyDB, Query
 
+
 def fetch_food_json():
     response = urllib.urlopen('http://www.hanssonohammar.se/veckansmeny.json')
     return json.loads(response.read().decode('utf-8'))
+
 
 def get_food_from_json(data, day):
     if day not in data:
@@ -26,10 +28,12 @@ def get_food_from_json(data, day):
 
     return "\n".join(mat_today['IKSU'])
 
+
 def get_food(day):
     # Get JSON
     data = fetch_food_json()
     return get_food_from_json(data, day)
+
 
 @listen_to(r'^veckans mat$')
 def veckans_mat(message):
@@ -99,9 +103,11 @@ def fredag(message):
     else:
         message.reply(u"Nej, idag är det INTE fredag! :qq::gun:")
 
+
 @listen_to(ur'^n[\u00E4\u00C4]r.*hem.*\?', re.IGNORECASE)
 def hem(message):
     message.reply(u"Det är väl bara att gå")
+
 
 @listen_to(ur'^n[\u00E4\u00C4]r.*helg.*\?', re.IGNORECASE)
 def whenhelg(message):
@@ -222,6 +228,27 @@ def stackoverflow(message, query):
     reply = reply.replace('</strong>', '*')
 
     message.reply(u"{}".format(reply))
+
+
+@listen_to(r'^fika$')
+def fika(message):
+    # FIXME: If now() is after Friday 17:00 CET/CEST then reply with person for next week
+    fikalistan = [
+        'simon',
+        'kev',
+        'mancus',
+        'hansson',
+        'ps',
+        'tomas',
+        'matilda',
+    ]
+    fikalistan_start = 40
+
+    week = datetime.datetime.now().isocalendar()[1]
+    fikalistan_index = (week - fikalistan_start) % len(fikalistan)
+    person = fikalistan[fikalistan_index]
+
+    message.reply(u'På fredag har {} fika!'.format(person))
 
 
 def main():
