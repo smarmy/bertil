@@ -182,61 +182,43 @@ def get_random_quote(message):
 def stackoverflow(message, query):
     url = 'https://api.stackexchange.com'
 
-    response = requests.get('{}/2.2/search/advanced?q={}&accepted=True' \
-                            '&site=stackoverflow'.format(url, query))
-    data = response.json()
-    items = data['items']
-    answers = []
+    # Search for question and retrieve answer id
+    search_url = '{}/2.2/search/advanced?order=desc&sort=votes&accepted=True' \
+                 '&site=stackoverflow&q={}'.format(url, query)
+    response = requests.get(search_url)
+    question = response.json()['items'][0]
+    answer_id = question['accepted_answer_id']
 
-    for item in items:
-        answer_id = item['accepted_answer_id']
-        answers.append(str(answer_id))
+    # Get answer
+    answer_url = '{}/2.2/answers/{}?&site=stackoverflow&filter=withbody'.format(url, answer_id)
+    response = requests.get(answer_url)
+    answer = response.json()['items'][0]
+    answer_body = answer['body']
 
-    while len(answers) > 100:
-        answers.pop()
+    # Only reply with first 6 rows in answer
+    reply = '\n'.join([body for body in answer_body.split('\n')[:6]])
+    reply += '\n...'
+    reply += '\nhttps://stackoverflow.com/a/{}'.format(answer_id)
 
-    answer_str = ';'.join(answers)
-    response = requests.get('{}/2.2/answers/{}?order=desc&sort=activity' \
-                            '&site=stackoverflow&filter=withbody'.format(url, answer_str))
+    # Format for Slack
+    reply = reply.replace('<p>', '')
+    reply = reply.replace('</p>', '')
+    reply = reply.replace('<code>', '```')
+    reply = reply.replace('</code>', '```')
+    reply = reply.replace('<ul>', '')
+    reply = reply.replace('</ul>', '')
+    reply = reply.replace('<li>', '* ')
+    reply = reply.replace('</li>', '')
+    reply = reply.replace('<pre>', '')
+    reply = reply.replace('</pre>', '')
+    reply = reply.replace('&lt;', '<')
+    reply = reply.replace('&gt;', '>')
+    reply = reply.replace('<em>', '*')
+    reply = reply.replace('</em>', '*')
+    reply = reply.replace('<strong>', '*')
+    reply = reply.replace('</strong>', '*')
 
-    data = response.json()
-    items = data['items']
-    max_score = 0
-    max_answer = None
-    for item in items:
-        score = item['score']
-        if score > max_score:
-            max_score = score
-            max_answer = item
-
-    body = max_answer['body']
-    body = body.replace('<p>', '')
-    body = body.replace('</p>', '')
-    body = body.replace('<code>', '```')
-    body = body.replace('</code>', '```')
-    body = body.replace('<ul>', '')
-    body = body.replace('</ul>', '')
-    body = body.replace('<li>', '* ')
-    body = body.replace('</li>', '')
-    body = body.replace('<pre>', '')
-    body = body.replace('</pre>', '')
-    body = body.replace('&lt;', '<')
-    body = body.replace('&gt;', '>')
-    body = body.replace('<em>', '*')
-    body = body.replace('</em>', '*')
-    body = body.replace('<strong>', '*')
-    body = body.replace('</strong>', '*')
-
-    bodylist = [body for body in body.split('\n') if body]
-
-    while len(bodylist) > 6:
-        bodylist.pop()
-    bodylist.append('...')
-
-    body = '\n'.join(bodylist)
-    body += '\nhttps://stackoverflow.com/a/{}'.format(max_answer['answer_id'])
-
-    message.reply(u"{}".format(body))
+    message.reply(u"{}".format(reply))
 
 
 def main():
