@@ -230,9 +230,8 @@ def stackoverflow(message, query):
     message.reply(u"{}".format(reply))
 
 
-@listen_to(r'^fika$')
-def fika(message):
-    # FIXME: If now() is after Friday 17:00 CET/CEST then reply with person for next week
+@listen_to(r'^fika(\+*)$')
+def fika(message, plus):
     fikalistan = [
         'simon',
         'kev',
@@ -244,11 +243,11 @@ def fika(message):
     ]
     fikalistan_start = 40
 
-    week = datetime.datetime.now().isocalendar()[1]
+    week = datetime.datetime.now().isocalendar()[1] + len(plus)
     fikalistan_index = (week - fikalistan_start) % len(fikalistan)
     person = fikalistan[fikalistan_index]
 
-    message.reply(u'På fredag har {} fika!'.format(person))
+    message.reply(u'Vecka {} har {} fika!'.format(week, person))
 
 
 def main():
