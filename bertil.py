@@ -10,7 +10,7 @@ import random
 import requests
 from slackbot.bot import Bot, listen_to
 from tinydb import TinyDB, Query
-
+import bertil_secrets
 
 def fetch_food_json():
     response = urllib.urlopen('http://www.hanssonohammar.se/veckansmeny.json')
@@ -248,6 +248,19 @@ def fika(message, plus):
     person = fikalistan[fikalistan_index]
 
     message.reply(u'Vecka {} har {} fika!'.format(week, person))
+
+
+@listen_to(r'^ica$')
+def ica(message):
+    access_token = bertil_secrets.FB_ACCESS_TOKEN
+    url = 'https://graph.facebook.com/v2.10/IcaAlidhem/feed?access_token={}'.format(access_token)
+    response_json = requests.get(url).json()
+    for entry in reponse_json['data']:
+        if 'lunch' in entry['message']:
+            message.reply(entry['message'])
+            return
+
+    message.reply(u'Hittade ingen lunch :-(')
 
 
 def main():
