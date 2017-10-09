@@ -255,7 +255,7 @@ def ica(message):
     access_token = bertil_secrets.FB_ACCESS_TOKEN
     url = 'https://graph.facebook.com/v2.10/IcaAlidhem/feed?access_token={}'.format(access_token)
     response_json = requests.get(url).json()
-    for entry in reponse_json['data']:
+    for entry in response_json['data']:
         if 'lunch' in entry['message']:
             message.reply(entry['message'])
             return
