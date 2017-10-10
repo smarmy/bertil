@@ -269,7 +269,7 @@ def ica(message):
     message.reply(u'Hittade ingen lunch :-(')
 
 
-@listen_to('r^apa$')
+@listen_to(r'^apa$')
 def apa(message):
     if not message._client._bertil_apa:
         message._client._bertil_apa = 0
