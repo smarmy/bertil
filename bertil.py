@@ -271,10 +271,8 @@ def ica(message):
 
 @listen_to(r'^apa$')
 def apa(message):
-    if not hasattr(message._client, '_bertil_apa'):
+    if not message._client._bertil_apa:
         message._client._bertil_apa = 0
-
-    message._client._bertil_apa += 1
 
     message.reply(u'{}'.format(message._client._bertil_apa))
 
