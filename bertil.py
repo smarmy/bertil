@@ -257,7 +257,13 @@ def ica(message):
     response_json = requests.get(url).json()
     for entry in response_json['data']:
         if 'lunch' in entry['message']:
-            message.reply(entry['message'])
+            today = datetime.datetime.now().date()
+            entry_date_str = entry['created_time'].split('T')[0]
+            entry_date = datetime.datetime.strptime(entry_date_str, '%Y-%m-%d')
+            if entry_date == today:
+                message.reply(entry['message'])
+            else:
+                message.reply(u'Senaste lunchinlägget är från {} :-('.format(entry_date))
             return
 
     message.reply(u'Hittade ingen lunch :-(')
