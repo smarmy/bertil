@@ -269,6 +269,14 @@ def ica(message):
     message.reply(u'Hittade ingen lunch :-(')
 
 
+@listen_to('r^apa$')
+def apa(message):
+    if not message._client._bertil_apa:
+        message._client._bertil_apa = 0
+
+    message.reply(u'{}'.format(message._client._bertil_apa))
+
+
 def main():
     bot = Bot()
     bot.run()
