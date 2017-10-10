@@ -259,7 +259,7 @@ def ica(message):
         if 'lunch' in entry['message']:
             today = datetime.datetime.now().date()
             entry_date_str = entry['created_time'].split('T')[0]
-            entry_date = datetime.datetime.strptime(entry_date_str, '%Y-%m-%d')
+            entry_date = datetime.datetime.strptime(entry_date_str, '%Y-%m-%d').date()
             if entry_date == today:
                 message.reply(entry['message'])
             else:
