@@ -38,7 +38,7 @@ def get_food(day):
 
 @listen_to(r'^help$')
 def bertil_help(message):
-    func_names = [func.__name__ for _, func in PluginsManager.commands['listen_to'].iteritems()]
+    func_names = [str(key) for key, _ in PluginsManager.commands['listen_to'].iteritems()]
     message.reply(u'Jag kan följade kommandon:\n```{}```'.format('\n'.join(func_names)))
 
 
