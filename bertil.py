@@ -9,6 +9,7 @@ import re
 import random
 import requests
 from slackbot.bot import Bot, listen_to
+from slackbot.manager import PluginsManager
 from tinydb import TinyDB, Query
 import bertil_secrets
 
@@ -33,6 +34,12 @@ def get_food(day):
     # Get JSON
     data = fetch_food_json()
     return get_food_from_json(data, day)
+
+
+@listen_to(r'^help$')
+def bertil_help(message):
+    func_names = [func.__name__ for _, func in PluginsManager.commands['listen_to'].iteritems()]
+    message.reply(u'Jag kan följade kommandon:\n```{}```'.format('\n'.join(func_names)))
 
 
 @listen_to(r'^veckans mat$')
