@@ -269,6 +269,13 @@ def ica(message):
     message.reply(u'Hittade ingen lunch :-(')
 
 
+@listen_to(r'^\$(.*)')
+def matte(message, math_string):
+    string = urllib.quote_plus(math_string)
+    string = requests.get("http://api.mathjs.org/v1/?expr={}".format(string)).text
+    message.reply(string)
+
+
 def main():
     bot = Bot()
     bot.run()
