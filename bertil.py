@@ -269,6 +269,97 @@ def ica(message):
     message.reply(u'Hittade ingen lunch :-(')
 
 
+@listen_to(r'^\$(.*)')
+def matte(message, math_string):
+    def do_math(string):
+        def tokenize(string):
+            tokens = []
+            number = ""
+            for char in string:
+                if char.isdigit():
+                    number += char
+                elif not char.isspace():
+                    if len(number) > 0:
+                        tokens.append(('number', number))
+                        number = ""
+                    tokens.append(('op', char))
+            if len(number) > 0:
+                tokens.append(('number', number))
+            return tokens
+
+        def precedence(oper):
+            if oper in '+-': return 1
+            if oper in '*/': return 2
+            if oper in '()': return 0
+            raise ValueError("Unknown operator: '{}''".format(oper))
+
+        def left_assoc(oper):
+            if oper in '+-*/': return True
+            if oper in '()': return False
+            raise ValueError("Unknown operator: '{}''".format(oper))
+
+        def shunting_yard(tokens):
+            out_queue = []
+            op_stack = []
+            while len(tokens) > 0:
+                (tok_type, token) = tokens.pop(0)
+                if tok_type == 'number':
+                    out_queue.append((tok_type, token))
+                elif token == '(':
+                    op_stack.insert(0, (tok_type, token))
+                elif token == ')':
+                    while len(op_stack) > 0 and op_stack[0][1] != '(':
+                        out_queue.append(op_stack.pop(0))
+                    if len(op_stack) > 0 and op_stack[0][1] == '(':
+                        op_stack.pop(0)
+                    else:
+                        raise ValueError("Unbalanced parentheses")
+                elif tok_type == 'op':
+                    while len(op_stack) > 0 and left_assoc(op_stack[0][1]) and precedence(op_stack[0][1]) >= precedence(token):
+                        out_queue.append(op_stack.pop(0))
+                    op_stack.insert(0, (tok_type, token))
+            while len(op_stack) > 0:
+                (tok_type, token) = op_stack.pop()
+                if token in '()': raise ValueError("Unbalanced parentheses")
+                out_queue.append((tok_type, token))
+            
+            return [token for (tok_type, token) in out_queue]
+
+        tokens = tokenize(string)
+        tokens = shunting_yard(tokens)
+        stack = []
+        for tok in tokens:
+            stack.insert(0, tok)
+            if tok == '+':
+                stack.pop(0)
+                b = stack.pop(0)
+                a = stack.pop(0)
+                stack.insert(0, str(float(a) + float(b)))
+            elif tok == '-':
+                stack.pop(0)
+                b = stack.pop(0)
+                a = stack.pop(0)
+                stack.insert(0, str(float(a) - float(b)))
+            elif tok == '*':
+                stack.pop(0)
+                b = stack.pop(0)
+                a = stack.pop(0)
+                stack.insert(0, str(float(a) * float(b)))
+            elif tok == '/':
+                stack.pop(0)
+                b = stack.pop(0)
+                a = stack.pop(0)
+                stack.insert(0, str(float(a) / float(b)))
+        if len(stack) != 1:
+            raise "Bad math! Stack: [{}]".format(stack)
+        return stack[0]
+
+    try:
+        message.reply(u"{}".format(do_math(math_string)))
+    except Exception as exception:
+        message.reply(u"Error: {}".format(exception))
+
+
 def main():
     bot = Bot()
     bot.run()
