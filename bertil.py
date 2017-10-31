@@ -101,7 +101,7 @@ def youtube(message, query):
         developer_key = bertil_secrets.YOUTUBE_API_KEY
         youtube_api_service_name = 'youtube'
         youtube_api_version = 'v3'
-        max_results = 5
+        max_results = 1
 
         youtube_api = build(youtube_api_service_name,
                             youtube_api_version,
@@ -119,20 +119,21 @@ def youtube(message, query):
 
         for search_result in search_response.get('items', []):
             if search_result['id']['kind'] == 'youtube#video':
-                videos.append('%s (%s)' % (search_result['snippet']['title'],
-                                           search_result['id']['videoId']))
+              videos.append('{} (https://www.youtube.com/watch?v={})'.format(
+                  search_result['snippet']['title'],
+                  search_result['id']['videoId']))
             elif search_result['id']['kind'] == 'youtube#channel':
-                channels.append('%s (%s)' % (search_result['snippet']['title'],
-                                             search_result['id']['channelId']))
+              channels.append('{} (https://www.youtube.com/watch?v={})'.format(
+                  search_result['snippet']['title'],
+                  search_result['id']['channelId']))
             elif search_result['id]']['kind'] == 'youtube#playlist':
-                playlists.append('%s (%s)' % (search_result['snippet']['title'],
-                                              search_result['id']['playlistId']))
+              playlists.append('{} (https://www.youtube.com/watch?v={})'.format(
+                  search_result['snippet']['title'],
+                  search_result['id']['playlistId']))
 
-        reply = u'Videos:\n {} Channels:\n {} Playlists:\n {}'.format(
-            '\n'.join(videos), '\n'.join(channels), '\n'.join(playlists))
-        message.reply(reply)
+        message.reply(u'Videos:\n {}'.format('\n'.join(videos)))
     except HttpError, err:
-        message.reply('HTTP error %d happen:\n%s' % (err.resp.status, err.content))
+        message.reply('HTTP error {} happen:\n{}'.format(err.resp.status, err.content))
 
 @listen_to(ur'^[e\u00E4\u00C4]r.*m\u00E5ndag.*\?', re.IGNORECASE)
 def mondag(message):
