@@ -103,9 +103,11 @@ def youtube(message, query):
         youtube_api_version = 'v3'
         max_results = 5
 
-        youtube = build(youtube_api_service_name, youtube_api_version, developerKey=developer_key)
+        youtube_api = build(youtube_api_service_name,
+                            youtube_api_version,
+                            developerKey=developer_key)
 
-        search_response = youtube.search().list(
+        search_response = youtube_api.search().list(
             q=query,
             part='id, snippet',
             maxResults=max_results
@@ -118,10 +120,10 @@ def youtube(message, query):
         for search_result in search_response.get('items', []):
             if search_result['id']['kind'] == 'youtube#video':
                 videos.append('%s (%s)' % (search_result['snippet']['title'],
-                                          search_result['id']['videoId']))
+                                           search_result['id']['videoId']))
             elif search_result['id']['kind'] == 'youtube#channel':
                 channels.append('%s (%s)' % (search_result['snippet']['title'],
-                                            search_result['id']['channelId']))
+                                             search_result['id']['channelId']))
             elif search_result['id]']['kind'] == 'youtube#playlist':
                 playlists.append('%s (%s)' % (search_result['snippet']['title'],
                                               search_result['id']['playlistId']))
@@ -129,8 +131,8 @@ def youtube(message, query):
         reply = u'Videos:\n {} Channels:\n {} Playlists:\n {}'.format(
             '\n'.join(videos), '\n'.join(channels), '\n'.join(playlists))
         message.reply(reply)
-    except HttpError, e:
-        message.reply('HTTP error %d happen:\n%s' % (e.resp.status, e.content))
+    except HttpError, err:
+        message.reply('HTTP error %d happen:\n%s' % (err.resp.status, err.content))
 
 @listen_to(ur'^[e\u00E4\u00C4]r.*m\u00E5ndag.*\?', re.IGNORECASE)
 def mondag(message):
