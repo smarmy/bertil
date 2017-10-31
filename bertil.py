@@ -114,24 +114,14 @@ def youtube(message, query):
         ).execute()
 
         videos = []
-        channels = []
-        playlists = []
 
         for search_result in search_response.get('items', []):
-            if search_result['id']['kind'] == 'youtube#video':
-              videos.append('{} (https://www.youtube.com/watch?v={})'.format(
-                  search_result['snippet']['title'],
-                  search_result['id']['videoId']))
-            elif search_result['id']['kind'] == 'youtube#channel':
-              channels.append('{} (https://www.youtube.com/watch?v={})'.format(
-                  search_result['snippet']['title'],
-                  search_result['id']['channelId']))
-            elif search_result['id]']['kind'] == 'youtube#playlist':
-              playlists.append('{} (https://www.youtube.com/watch?v={})'.format(
-                  search_result['snippet']['title'],
-                  search_result['id']['playlistId']))
+             if search_result['id']['kind'] == 'youtube#video':
+                 videos.append('{} (https://www.youtube.com/watch?v={})'.format(
+                     search_result['snippet']['title'],
+                     search_result['id']['videoId']))
 
-        message.reply(u'Videos:\n {}'.format('\n'.join(videos)))
+        message.reply(u'{}'.format('\n'.join(videos)))
     except HttpError, err:
         message.reply('HTTP error {} happen:\n{}'.format(err.resp.status, err.content))
 
