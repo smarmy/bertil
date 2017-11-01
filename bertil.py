@@ -44,6 +44,61 @@ def get_food(day):
     data = fetch_food_json()
     return get_food_from_json(data, day)
 
+def get_swedish_year(year):
+    return requests.get('https://api.dryg.net/dagar/v2.1/{year}'.format(
+        year=year)).json()
+
+def get_swedish_month(year, month):
+    return requests.get('https://api.dryg.net/dagar/v2.1/{year}/{month}'.format(
+        year=year, month=month)).json() 
+
+def get_swedish_day(year, month, day):
+    return requests.get('https://api.dryg.net/dagar/v2.1/{year}/{month}/{day}'.format(
+        year=year, month=month, day=day)).json()    
+
+# shitty squeeze day...
+def is_squeeze_day(year, month, day):
+    month_json = get_swedish_month(year, month)['dagar']
+    
+    zero_indexed_day = day - 1
+
+    if (month_json[zero_indexed_day]['dag i vecka'] == 6 or 
+       month_json[zero_indexed_day]['dag i vecka'] == 7):
+        return False
+
+    month_before_json = None
+    month_after_json = None
+    
+    if month == 1:
+        month_before_json = get_swedish_month(year - 1, 12)['dagar']
+        month_after_json = get_swedish_month(year, month + 1)['dagar']
+    elif month == 12:
+        month_before_json = get_swedish_month(year, month - 1)['dagar']
+        month_after_json = get_swedish_month(year + 1, 1)['dagar']
+    else:
+        month_before_json = get_swedish_month(year, month - 1)['dagar']
+        month_after_json = get_swedish_month(year, month + 1)['dagar']
+
+    is_squeeze_day = False
+
+    if zero_indexed_day == 0:
+        is_squeeze_day = (month_json[zero_indexed_day]['röd dag'] == 'Ja' or
+                         month_json[zero_indexed_day + 1]['röd dag'] == 'Ja' or
+                         month_before_json[len(month_before_json)]['röd dag'] == 'Ja')
+    elif zero_indexed_day == len(month_json) - 1:
+        is_squeeze_day = (month_json[zero_indexed_day]['röd dag'] == 'Ja' or
+                         month_json[zero_indexed_day - 1]['röd dag'] == 'Ja' or
+                         month_after_json[0]['röd dag'] == 'Ja')
+    else:
+        is_squeeze_day = (month_json[zero_indexed_day]['röd dag'] == 'Ja' or
+                         month_json[zero_indexed_day + 1]['röd dag'] == 'Ja' or
+                         month_json[zero_indexed_day - 1]['röd dag'] == 'Ja')
+
+    return is_squeeze_day
+
+def is_workfree_day(year, month, day):
+    day = get_swedish_day(year, month, day)['dagar'][0]
+    return True if day['arbetsfri dag'] == 'Ja' else False
 
 @listen_to(r'^help$')
 def bertil_help(message):
