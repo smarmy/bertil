@@ -170,8 +170,8 @@ def whenhelg(message):
         diff = weekend - today
 
         days = diff.days
-        hours = diff.seconds / 3600
-        minutes = (diff.seconds - hours * 3600) / 60
+        hours = diff.seconds // 3600
+        minutes = (diff.seconds - hours * 3600) // 60
         seconds = diff.seconds - (hours * 3600) - (minutes * 60)
         message.reply("Det är {days} dagar {hours} timmar {minutes} minuter och {seconds} " \
                        "sekunder kvar... :disappointed:".format(days=days, hours=hours,
