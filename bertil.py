@@ -2,22 +2,28 @@
 
 import datetime
 import time
-import urllib
+import urllib.request
+import urllib.parse
+import urllib.error
 import json
 import socket
 import re
 import random
 import requests
+
 from slackbot.bot import Bot, listen_to
 from slackbot.manager import PluginsManager
+
 from tinydb import TinyDB, Query
-import bertil_secrets
+
 from apiclient.discovery import build
 from apiclient.errors import HttpError
 
+import bertil_secrets
+
 
 def fetch_food_json():
-    response = urllib.urlopen('http://www.hanssonohammar.se/veckansmeny.json')
+    response = urllib.request.urlopen('http://www.hanssonohammar.se/veckansmeny.json')
     return json.loads(response.read().decode('utf-8'))
 
 
@@ -41,13 +47,13 @@ def get_food(day):
 
 @listen_to(r'^help$')
 def bertil_help(message):
-    func_names = [p.pattern for p, _ in PluginsManager.commands['listen_to'].iteritems()]
-    message.reply(u'Jag kan följade kommandon:\n```{}```'.format('\n'.join(func_names)))
+    func_names = [p.pattern for p, _ in PluginsManager.commands['listen_to'].items()]
+    message.reply('Jag kan följade kommandon:\n```{}```'.format('\n'.join(func_names)))
 
 
 @listen_to(r'^veckans mat$')
 def veckans_mat(message):
-    days = [u"Måndag", u"Tisdag", u"Onsdag", u"Torsdag", u"Fredag"]
+    days = ["Måndag", "Tisdag", "Onsdag", "Torsdag", "Fredag"]
     today = datetime.datetime.today().weekday()
     nextweek = 0
 
@@ -57,43 +63,43 @@ def veckans_mat(message):
 
     data = fetch_food_json()
 
-    fulltext = u""
+    fulltext = ""
     for daynum in range(0, len(days) - today):
         date = datetime.date.fromtimestamp(time.time() + (86400 * nextweek) + (86400 * daynum))
         try:
-            fulltext += u"\n{}\n{}\n".format(days[today+daynum],
-                                             get_food_from_json(data, str(date)))
+            fulltext += "\n{}\n{}\n".format(days[today+daynum],
+                                            get_food_from_json(data, str(date)))
         except Exception as exception:
-            if exception.message:
-                fulltext += u"\n{}\n{}\n".format(days[today+daynum], exception.message)
+            if str(exception):
+                fulltext += "\n{}\n{}\n".format(days[today+daynum], str(exception))
             else:
-                fulltext += u"\n{}\n{}\n".format(days[today+daynum], u"Okänt fel")
+                fulltext += "\n{}\n{}\n".format(days[today+daynum], "Okänt fel")
 
     if fulltext:
-        message.reply(u"```{}```".format(fulltext))
+        message.reply("```{}```".format(fulltext))
     else:
-        message.reply(u"Hittade ingen mat.")
+        message.reply("Hittade ingen mat.")
 
 
 @listen_to(r'^vecka$')
 def vecka(message):
     week = datetime.datetime.now().isocalendar()[1]
-    message.reply(u"Vecka {}".format(week))
+    message.reply("Vecka {}".format(week))
 
 
 @listen_to(r'^datum$')
 def datum(message):
     date = datetime.datetime.now().strftime('%Y-%m-%d')
-    message.reply(u"{}".format(date))
+    message.reply("{}".format(date))
 
 
 @listen_to(r'^mat(\+*)$')
 def mat(message, plus):
     date = datetime.date.fromtimestamp(time.time() + (86400 * len(plus)))
     try:
-        message.reply(u"```IKSU - {}\n{}```".format(str(date), get_food(str(date))))
+        message.reply("```IKSU - {}\n{}```".format(str(date), get_food(str(date))))
     except Exception as exception:
-        message.reply(u"Kom inte åt maten 😞 ({what})".format(what=exception.message))
+        message.reply("Kom inte åt maten 😞 ({what})".format(what=str(exception)))
 
 
 @listen_to(r'^youtube(.*)')
@@ -114,48 +120,48 @@ def youtube(message, query):
             maxResults=max_results
         ).execute()
 
-    except HttpError, err:
-        message.reply(u'HTTP error {} happen:\n{}'.format(err.resp.status, err.content))
+    except HttpError as err:
+        message.reply('HTTP error {} happen:\n{}'.format(err.resp.status, err.content))
 
     videos = []
 
     for search_result in search_response.get('items', []):
         if search_result['id']['kind'] == 'youtube#video':
-            videos.append(u'{} (https://www.youtube.com/watch?v={})'.format(
+            videos.append('{} (https://www.youtube.com/watch?v={})'.format(
                 search_result['snippet']['title'],
                 search_result['id']['videoId']))
 
-    message.reply(u'{}'.format('\n'.join(videos)))
+    message.reply('{}'.format('\n'.join(videos)))
 
 
-@listen_to(ur'^[e\u00E4\u00C4]r.*m\u00E5ndag.*\?', re.IGNORECASE)
+@listen_to(r'^[e\u00E4\u00C4]r.*m\u00E5ndag.*\?', re.IGNORECASE)
 def mondag(message):
     if datetime.datetime.today().weekday() == 4:
-        message.reply(u"Nä det är fredag! :kreygasm:")
+        message.reply("Nä det är fredag! :kreygasm:")
     elif datetime.datetime.today().weekday() == 0:
-        message.reply(u":joy::gun:")
+        message.reply(":joy::gun:")
     else:
-        message.reply(u"Nä")
+        message.reply("Nä")
 
 
-@listen_to(ur'^[e\u00E4\u00C4]r.*fredag.*\?', re.IGNORECASE)
+@listen_to(r'^[e\u00E4\u00C4]r.*fredag.*\?', re.IGNORECASE)
 def fredag(message):
     if datetime.datetime.today().weekday() == 4:
-        message.reply(u"Japp, idag är det fredag! :kreygasm:")
+        message.reply("Japp, idag är det fredag! :kreygasm:")
     else:
-        message.reply(u"Nej, idag är det INTE fredag! :qq::gun:")
+        message.reply("Nej, idag är det INTE fredag! :qq::gun:")
 
 
-@listen_to(ur'^n[\u00E4\u00C4]r.*hem.*\?', re.IGNORECASE)
+@listen_to(r'^n[\u00E4\u00C4]r.*hem.*\?', re.IGNORECASE)
 def hem(message):
-    message.reply(u"Det är väl bara att gå")
+    message.reply("Det är väl bara att gå")
 
 
-@listen_to(ur'^n[\u00E4\u00C4]r.*helg.*\?', re.IGNORECASE)
+@listen_to(r'^n[\u00E4\u00C4]r.*helg.*\?', re.IGNORECASE)
 def whenhelg(message):
     today = datetime.datetime.now()
     if today.weekday() > 4 or (today.weekday() == 4 and today.hour >= 17):
-        message.reply(u"Det är ju redan helg din knasboll! :kreygasm:")
+        message.reply("Det är ju redan helg din knasboll! :kreygasm:")
     else:
         weekend = today.replace(hour=17, minute=0, second=0)
         while weekend.weekday() < 4:
@@ -167,7 +173,7 @@ def whenhelg(message):
         hours = diff.seconds / 3600
         minutes = (diff.seconds - hours * 3600) / 60
         seconds = diff.seconds - (hours * 3600) - (minutes * 60)
-        message.reply(u"Det är {days} dagar {hours} timmar {minutes} minuter och {seconds} " \
+        message.reply("Det är {days} dagar {hours} timmar {minutes} minuter och {seconds} " \
                        "sekunder kvar... :disappointed:".format(days=days, hours=hours,
                                                                 minutes=minutes, seconds=seconds))
 
@@ -179,14 +185,14 @@ def temp(message):
     response = sock.recv(1024)
     sock.close()
     current_time, current_temp = response[:len(response) - 1].split('=')
-    message.reply(u"{} C klockan {}".format(current_temp, current_time))
+    message.reply("{} C klockan {}".format(current_temp, current_time))
 
 
 @listen_to(r'^quote add (.*)$')
 def quote_add(message, quote):
     tdb = TinyDB('/home/simon/bertil/quotes.json')
     tdb.insert({'quote': quote})
-    message.reply(u"Quote inlagd!")
+    message.reply("Quote inlagd!")
 
 
 @listen_to(r'^quote remove (.*)$')
@@ -195,7 +201,7 @@ def quote_remove(message, quote):
     query = Query()
     if tdb.search(query.quote == quote):
         tdb.remove(query.quote == quote)
-        message.reply(u"Tog bort {quote}.".format(quote=quote))
+        message.reply("Tog bort {quote}.".format(quote=quote))
     else:
         message.reply("?")
 
@@ -208,11 +214,11 @@ def quote_find(message, quote_regex):
         stuff = tdb.search(query.quote.search(quote_regex))
         quotes = [s['quote'] for s in stuff]
         if quotes:
-            message.reply(u"Hittade det här:\n```{quotes}```".format(quotes='\n'.join(quotes)))
+            message.reply("Hittade det här:\n```{quotes}```".format(quotes='\n'.join(quotes)))
         else:
-            message.reply(u"Hittade inget :-(")
+            message.reply("Hittade inget :-(")
     except Exception as exception:
-        message.reply(u"Vad sysslar du med?! ({err})".format(err=exception.message))
+        message.reply("Vad sysslar du med?! ({err})".format(err=str(exception)))
 
 
 @listen_to(r'^quote$')
@@ -220,10 +226,10 @@ def get_random_quote(message):
     tdb = TinyDB('/home/simon/bertil/quotes.json')
     quotes = tdb.all()
     if not quotes:
-        message.reply(u"Inga quotes inlagda...")
+        message.reply("Inga quotes inlagda...")
     else:
         quote = random.choice(quotes)
-        message.reply(u"```{}```".format(quote['quote']))
+        message.reply("```{}```".format(quote['quote']))
 
 
 @listen_to(r'^so (.*)$')
@@ -235,7 +241,7 @@ def stackoverflow(message, query):
                  '&site=stackoverflow&q={}'.format(url, query)
     response_json = requests.get(search_url).json()
     if not response_json['items']:
-        message.reply(u'Inga träffar! :-(')
+        message.reply('Inga träffar! :-(')
         return
     question = response_json['items'][0]
     answer_id = question['accepted_answer_id']
@@ -269,7 +275,7 @@ def stackoverflow(message, query):
     reply = reply.replace('<strong>', '*')
     reply = reply.replace('</strong>', '*')
 
-    message.reply(u"{}".format(reply))
+    message.reply("{}".format(reply))
 
 
 @listen_to(r'^fika(\+*)$')
@@ -289,7 +295,7 @@ def fika(message, plus):
     fikalistan_index = (week - fikalistan_start) % len(fikalistan)
     person = fikalistan[fikalistan_index]
 
-    message.reply(u'Vecka {} har {} fika!'.format(week, person))
+    message.reply('Vecka {} har {} fika!'.format(week, person))
 
 
 @listen_to(r'^ica$')
@@ -305,15 +311,15 @@ def ica(message):
             if entry_date == today:
                 message.reply(entry['message'])
             else:
-                message.reply(u'Senaste lunchinlägget är från {} :-('.format(entry_date))
+                message.reply('Senaste lunchinlägget är från {} :-('.format(entry_date))
             return
 
-    message.reply(u'Hittade ingen lunch :-(')
+    message.reply('Hittade ingen lunch :-(')
 
 
 @listen_to(r'^\$(.*)')
 def matte(message, math_string):
-    string = urllib.quote_plus(math_string)
+    string = urllib.parse.quote_plus(math_string)
     string = requests.get("http://api.mathjs.org/v1/?expr={}".format(string)).text
     message.reply(string)
 

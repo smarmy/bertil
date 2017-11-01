@@ -2,3 +2,4 @@ requests==2.18.3
 slackbot==0.5.1
 tinydb==3.4.0
 google-api-python-client==1.6.4
+pylint
