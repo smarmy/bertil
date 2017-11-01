@@ -115,13 +115,13 @@ def youtube(message, query):
         ).execute()
 
     except HttpError, err:
-        message.reply('HTTP error {} happen:\n{}'.format(err.resp.status, err.content))
+        message.reply(u'HTTP error {} happen:\n{}'.format(err.resp.status, err.content))
 
     videos = []
 
     for search_result in search_response.get('items', []):
         if search_result['id']['kind'] == 'youtube#video':
-            videos.append('{} (https://www.youtube.com/watch?v={})'.format(
+            videos.append(u'{} (https://www.youtube.com/watch?v={})'.format(
                 search_result['snippet']['title'],
                 search_result['id']['videoId']))
 
