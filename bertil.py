@@ -184,7 +184,8 @@ def temp(message):
     sock.connect(('temp.acc.umu.se', 2345))
     response = sock.recv(1024)
     sock.close()
-    current_time, current_temp = response[:len(response) - 1].split('=')
+    response_str = response.decode('ascii')
+    current_time, current_temp = response_str[:len(response_str) - 1].split('=')
     message.reply("{} C klockan {}".format(current_temp, current_time))
 
 
