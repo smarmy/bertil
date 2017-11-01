@@ -324,6 +324,9 @@ def matte(message, math_string):
     string = requests.get("http://api.mathjs.org/v1/?expr={}".format(string)).text
     message.reply(string)
 
+@listen_to(r'^.*bertil[?!]*$')
+def hmm(message):
+    message.reply('Vad saru?')
 
 def main():
     bot = Bot()
