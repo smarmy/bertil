@@ -12,9 +12,9 @@ from slackbot.bot import Bot, listen_to
 from slackbot.manager import PluginsManager
 from tinydb import TinyDB, Query
 import bertil_secrets
-# youtube
 from apiclient.discovery import build
 from apiclient.errors import HttpError
+
 
 def fetch_food_json():
     response = urllib.urlopen('http://www.hanssonohammar.se/veckansmeny.json')
@@ -43,6 +43,7 @@ def get_food(day):
 def bertil_help(message):
     func_names = [p.pattern for p, _ in PluginsManager.commands['listen_to'].iteritems()]
     message.reply(u'Jag kan följade kommandon:\n```{}```'.format('\n'.join(func_names)))
+
 
 @listen_to(r'^veckans mat$')
 def veckans_mat(message):
@@ -97,12 +98,12 @@ def mat(message, plus):
 
 @listen_to(r'^youtube(.*)')
 def youtube(message, query):
-    try:
-        developer_key = bertil_secrets.YOUTUBE_API_KEY
-        youtube_api_service_name = 'youtube'
-        youtube_api_version = 'v3'
-        max_results = 1
+    developer_key = bertil_secrets.YOUTUBE_API_KEY
+    youtube_api_service_name = 'youtube'
+    youtube_api_version = 'v3'
+    max_results = 1
 
+    try:
         youtube_api = build(youtube_api_service_name,
                             youtube_api_version,
                             developerKey=developer_key)
@@ -113,17 +114,19 @@ def youtube(message, query):
             maxResults=max_results
         ).execute()
 
-        videos = []
-
-        for search_result in search_response.get('items', []):
-             if search_result['id']['kind'] == 'youtube#video':
-                 videos.append('{} (https://www.youtube.com/watch?v={})'.format(
-                     search_result['snippet']['title'],
-                     search_result['id']['videoId']))
-
-        message.reply(u'{}'.format('\n'.join(videos)))
     except HttpError, err:
         message.reply('HTTP error {} happen:\n{}'.format(err.resp.status, err.content))
+
+    videos = []
+
+    for search_result in search_response.get('items', []):
+        if search_result['id']['kind'] == 'youtube#video':
+            videos.append('{} (https://www.youtube.com/watch?v={})'.format(
+                search_result['snippet']['title'],
+                search_result['id']['videoId']))
+
+    message.reply(u'{}'.format('\n'.join(videos)))
+
 
 @listen_to(ur'^[e\u00E4\u00C4]r.*m\u00E5ndag.*\?', re.IGNORECASE)
 def mondag(message):
