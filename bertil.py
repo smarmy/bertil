@@ -44,14 +44,20 @@ def get_food(day):
     data = fetch_food_json()
     return get_food_from_json(data, day)
 
+# Takes a year, returns a year worth of json from api.dryg.net
+# See https://api.dryg.net/ for json format
 def get_swedish_year(year):
     return requests.get('https://api.dryg.net/dagar/v2.1/{year}'.format(
         year=year)).json()
 
+# Takes a year and a month, returns a month worth of json from api.dryg.net
 def get_swedish_month(year, month):
     return requests.get('https://api.dryg.net/dagar/v2.1/{year}/{month}'.format(
         year=year, month=month)).json()
 
+# Takes a year, a month and a day, returns an array containing a weeks
+# worth of json aquired from api.dryg.net representing the week in which
+# the date sent to function resides
 def get_swedish_week(year, month, day):
     month_json = get_swedish_month(year, month)['dagar']
     month_before_json = None
@@ -69,7 +75,7 @@ def get_swedish_week(year, month, day):
         month_before_json = get_swedish_month(year, month - 1)['dagar']
         month_after_json = get_swedish_month(year, month + 1)['dagar']
 
-    today_index = len(month_json) + date.day
+    today_index = len(month_before_json) + date.day - 1
     monday_index = today_index - date.weekday()
     sunday_index = today_index + (7 - date.weekday())
 
@@ -77,26 +83,30 @@ def get_swedish_week(year, month, day):
 
     return all_days[monday_index:sunday_index]
 
+# Returns an array containing the current week in json from api.dryg.net
 def get_current_swedish_week():
     today = datetime.datetime.today()
     return get_swedish_week(today.year, today.month, today.day)
 
+# Takes a year, month and day, returns the json string representing
+# this day aquired from api.dryg.net
 def get_swedish_day(year, month, day):
     return requests.get('https://api.dryg.net/dagar/v2.1/{year}/{month}/{day}'.format(
         year=year, month=month, day=day)).json()
 
-# shitty squeeze day...
-def is_squeeze_day(year, month, day):
-    date = datetime.date(year, month, day)
-    week_json = get_swedish_week(year, month, day)
-    start_day = date.weekday() - 1 if date.weekday() > 0 else date.weekday()
-    end_day = date.weekday() + 1 if date.weekday() < 6 else date.weekday()
+# Takes an array with a weeks worth of json from api.dryg.net along
+# with a weekday index. Makes a shitty guess and returns True if the
+# day is a squeeze day, False otherwise, _highly_ unreliable
+def is_squeeze_day(weekday_index, week_json):
+    day_before = weekday_index - 1 if weekday_index > 0 else weekday_index
+    day_after = weekday_index + 1 if weekday_index < 6 else weekday_index
 
-    return (week_json[start_day]['röd dag'] == 'Ja' or
-            week_json[end_day]['röd dag'] == 'Ja')
+    return (week_json[day_before]['röd dag'] == 'Ja' or
+            week_json[day_after]['röd dag'] == 'Ja')
 
-def is_workfree_day(year, month, day):
-    day = get_swedish_day(year, month, day)['dagar'][0]
+# Takes a day json string from api.dryg.net
+# Returns True if day is Workfree, False otherwise
+def is_workfree_day(day):
     return day['arbetsfri dag'] == 'Ja'
 
 @listen_to(r'^help$')
@@ -214,23 +224,32 @@ def hem(message):
 @listen_to(r'^n[\u00E4\u00C4]r.*helg.*\?', re.IGNORECASE)
 def whenhelg(message):
     today = datetime.datetime.now()
-    if today.weekday() > 4 or (today.weekday() == 4 and today.hour >= 17):
-        message.reply("Det är ju redan helg din knasboll! :kreygasm:")
+    week = get_current_swedish_week()
+    days = 0
+
+    for day in week[today.weekday():len(week)]:
+        day_index = int(day['dag i vecka']) - 1
+        if (not is_workfree_day(day) and not
+                is_squeeze_day(day_index, week)):
+            days += 1
+
+    hours = 0
+    if 17 - today.hour <= 0:
+        days -= 1
     else:
-        weekend = today.replace(hour=17, minute=0, second=0)
-        while weekend.weekday() < 4:
-            weekend += datetime.timedelta(1)
+        hours = 17 - today.hour
 
-        diff = weekend - today
+    reactions = [':kreygasm:',
+                 ':relieved:',
+                 ':neutral_face:'
+                 ':disappointed::gun:',
+                 ':disappointed::noose:',
+                ]
 
-        days = diff.days
-        hours = diff.seconds // 3600
-        minutes = (diff.seconds - hours * 3600) // 60
-        seconds = diff.seconds - (hours * 3600) - (minutes * 60)
-        message.reply("Det är {days} dagar {hours} timmar {minutes} minuter och {seconds} " \
-                       "sekunder kvar... :disappointed:".format(days=days, hours=hours,
-                                                                minutes=minutes, seconds=seconds))
-
+    message.reply('Det är {days} dagar och {hours} timmar kvar till helgen...' \
+                  '{reaction}'.format(days=days,
+                                      hours=hours,
+                                      reaction=reactions[days]))
 
 @listen_to(r'^temp$')
 def temp(message):
