@@ -1,10 +1,10 @@
-import urllib.request
+import datetime
 import json
 import requests
 
 def fetch_food_json():
-    response = urllib.request.urlopen('http://www.hanssonohammar.se/veckansmeny.json')
-    return json.loads(response.read().decode('utf-8'))
+    response = requests.get('http://www.hanssonohammar.se/veckansmeny.json').text
+    return json.loads(response)
 
 
 def get_food_from_json(data, day):

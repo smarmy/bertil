@@ -2,9 +2,7 @@
 
 import datetime
 import time
-import urllib.request
 import urllib.parse
-import urllib.error
 import socket
 import re
 import random
