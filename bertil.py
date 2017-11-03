@@ -144,7 +144,7 @@ def whenhelg(message):
             days += 1
 
     hours = 0
-    if 17 - today.hour <= 0:
+    if today.hour < 8 or today.hour > 17:
         days -= 1
     else:
         hours = 17 - today.hour
@@ -156,7 +156,7 @@ def whenhelg(message):
                  ':disappointed::noose:',
                 ]
 
-    if days == 0 and hours == 0:
+    if days <= 0 and hours == 0:
         message.reply('Det är ju redan helg! :kreygasm:')
     else:
         message.reply('Det är {days} dagar och {hours} timmar kvar till' \
