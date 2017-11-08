@@ -319,7 +319,7 @@ def hmm(message):
 def status(message):
     result = subprocess.run(['ssh', 'gamma', '/home/simon/status/status.sh'],
                             stdout=subprocess.PIPE)
-    message.reply("```{}```".format(result.stdout))
+    message.reply("```{}```".format(result.stdout.decode('ascii')))
 
 
 def main():
