@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
-
 import datetime
 import time
 import urllib.parse
 import socket
 import re
 import random
+import subprocess
 import requests
 
 from slackbot.bot import Bot, listen_to
@@ -310,9 +309,18 @@ def matte(message, math_string):
     string = requests.get("http://api.mathjs.org/v1/?expr={}".format(string)).text
     message.reply(string)
 
+
 @listen_to(r'^.*bertil[?!]*$')
 def hmm(message):
     message.reply('Vad saru?')
+
+
+@listen_to(r'^status$')
+def status(message):
+    result = subprocess.run(['ssh', 'gamma', '/home/simon/status/status.sh'],
+                            stdout=subprocess.PIPE)
+    message.reply("```{}```".format(result.stdout))
+
 
 def main():
     bot = Bot()
