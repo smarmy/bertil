@@ -267,15 +267,15 @@ def stackoverflow(message, query):
 @listen_to(r'^fika(\+*)$')
 def fika(message, plus):
     fikalistan = [
-        'simon',
-        'kev',
-        'mancus',
-        'hansson',
+        'kasper',
         'ps',
         'tomas',
         'matilda',
+        'simon',
+        'mancus',
+        'hansson',
     ]
-    fikalistan_start = 40
+    fikalistan_start = 45
 
     week = datetime.datetime.now().isocalendar()[1] + len(plus)
     fikalistan_index = (week - fikalistan_start) % len(fikalistan)
