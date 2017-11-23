@@ -295,7 +295,7 @@ def fika(message, plus):
     fikalistan_index = (week - fikalistan_start) % len(fikalistan)
     person = fikalistan[fikalistan_index]
 
-    message.reply('Vecka {} har {} fika!'.format(week, person))
+    message.reply('Vecka {} har @{} fika!'.format(week, person))
 
 
 @listen_to(r'^ica$')
