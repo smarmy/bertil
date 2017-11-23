@@ -24,8 +24,13 @@ def bertil_help(message):
     message.reply('Jag kan följade kommandon:\n```{}```'.format('\n'.join(func_names)))
 
 
-@listen_to(r'^veckans mat$')
-def veckans_mat(message):
+@listen_to(r'^veckans mat(\s*konst)?$')
+def veckans_mat(message, restaurant):
+    if restaurant is None:
+        restaurant = 'IKSU'
+    else:
+        restaurant = 'KONST'
+
     days = ["Måndag", "Tisdag", "Onsdag", "Torsdag", "Fredag"]
     today = datetime.datetime.today().weekday()
     nextweek = 0
@@ -41,7 +46,7 @@ def veckans_mat(message):
         date = datetime.date.fromtimestamp(time.time() + (86400 * nextweek) + (86400 * daynum))
         try:
             fulltext += "\n{}\n{}\n".format(days[today+daynum],
-                                            utils.get_food_from_json(data, str(date)))
+                                            utils.get_food_from_json(data, restaurant, str(date)))
         except Exception as exception:
             if str(exception):
                 fulltext += "\n{}\n{}\n".format(days[today+daynum], str(exception))
@@ -66,13 +71,22 @@ def datum(message):
     message.reply("{}".format(date))
 
 
-@listen_to(r'^mat(\+*)$')
-def mat(message, plus):
+@listen_to(r'^mat(\+*)(\s*konst)?$')
+def mat(message, plus, restaurant):
     date = datetime.date.fromtimestamp(time.time() + (86400 * len(plus)))
+
+    if restaurant is None:
+        restaurant = 'IKSU'
+    else:
+        restaurant = 'KONST'
+
     try:
-        message.reply("```IKSU - {}\n{}```".format(str(date), utils.get_food(str(date))))
+        message.reply("```{} - {}\n{}```".format(restaurant,
+                                                 str(date),
+                                                 utils.get_food(restaurant, str(date))))
     except Exception as exception:
-        message.reply("Kom inte åt maten 😞 ({what})".format(what=str(exception)))
+        message.reply("Kom inte åt maten från {} 😞 ({what})".format(restaurant,
+                                                                    what=str(exception)))
 
 
 @listen_to(r'^youtube(.*)')

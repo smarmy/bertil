@@ -7,22 +7,27 @@ def fetch_food_json():
     return json.loads(response)
 
 
-def get_food_from_json(data, day):
+def get_food_from_json(data, restaurant, day):
     if day not in data:
         return "(no mat " + str(day) + ")"
 
-    mat_today = data[day][0]
+    if restaurant == 'IKSU':
+        mat_today = data[day][0]
+    elif restaurant == 'KONST':
+        mat_today = data[day][1]
+    else:
+        return "(restaurant not known)"
 
-    if 'IKSU' not in mat_today:
-        return "(no IKSU today)"
+    if restaurant not in mat_today:
+        return "(no {} today)".format(restaurant)
 
-    return "\n".join(mat_today['IKSU'])
+    return "\n".join(mat_today[restaurant])
 
 
-def get_food(day):
+def get_food(restaurant, day):
     # Get JSON
     data = fetch_food_json()
-    return get_food_from_json(data, day)
+    return get_food_from_json(data, restaurant, day)
 
 
 # Takes a year, returns a year worth of json from api.dryg.net
