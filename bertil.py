@@ -7,7 +7,7 @@ import random
 import subprocess
 import requests
 
-from slackbot.bot import Bot, listen_to
+from slackbot.bot import Bot, listen_to, respond_to
 from slackbot.manager import PluginsManager
 
 from tinydb import TinyDB, Query
@@ -41,7 +41,7 @@ def veckans_mat(message, restaurant):
 
     data = utils.fetch_food_json()
 
-    fulltext = ""
+    fulltext = "Veckans mat på {}:".format(restaurant)
     for daynum in range(0, len(days) - today):
         date = datetime.date.fromtimestamp(time.time() + (86400 * nextweek) + (86400 * daynum))
         try:
@@ -334,6 +334,17 @@ def status(message):
     result = subprocess.run(['ssh', 'gamma', '/home/simon/status/status.sh'],
                             stdout=subprocess.PIPE)
     message.reply("```{}```".format(result.stdout.decode('ascii')))
+
+@respond_to(r'^help$')
+def bertil_private_help(message):
+    func_names = [p.pattern for p, _ in PluginsManager.commands['respond_to'].items()]
+    message.reply('Jag kan följade kommandon:\n```{}```'.format('\n'.join(func_names)))
+
+@respond_to(r'^s\u00E4g (.*)$')
+def speak(message, text):
+    message.reply("Åkejrå, skickar till #general. Hoppas de inte skjuter budbäraren... :qq: :gun:")
+    message.body['channel'] = 'C2R7P4B8B'
+    message.send(text)
 
 
 def main():
