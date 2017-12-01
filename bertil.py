@@ -5,9 +5,10 @@ import socket
 import re
 import random
 import subprocess
+import json
 import requests
 
-from slackbot.bot import Bot, listen_to, respond_to
+from slackbot.bot import Bot, listen_to, respond_to, default_reply
 from slackbot.manager import PluginsManager
 
 from tinydb import TinyDB, Query
@@ -17,6 +18,8 @@ from apiclient.errors import HttpError
 
 import utils
 import bertil_secrets
+
+import markovify
 
 @listen_to(r'^help$')
 def bertil_help(message):
@@ -324,9 +327,22 @@ def matte(message, math_string):
     message.reply(string)
 
 
-@listen_to(r'^.*bertil[?!]*$')
-def hmm(message):
-    message.reply('Vad saru?')
+@default_reply
+def markov(message):
+    if not hasattr(markov, "text_model"):
+        with open('user_messages.json') as file_:
+            user_messages = json.load(file_)
+
+        messages = ''
+        for _ in user_messages:
+            messages += '\n'.join(messages)
+
+        markov.text_model = markovify.NewlineText(messages,
+                                                  state_size=random.randint(2, 4))
+
+    response = markov.text_model.make_sentence(tries=1024)
+
+    message.reply(response)
 
 
 @listen_to(r'^status$')
@@ -335,10 +351,12 @@ def status(message):
                             stdout=subprocess.PIPE)
     message.reply("```{}```".format(result.stdout.decode('ascii')))
 
+
 @respond_to(r'^help$')
 def bertil_private_help(message):
     func_names = [p.pattern for p, _ in PluginsManager.commands['respond_to'].items()]
     message.reply('Jag kan följade kommandon:\n```{}```'.format('\n'.join(func_names)))
+
 
 @respond_to(r'^s\u00E4g (.*)$')
 def speak(message, text):
@@ -348,6 +366,7 @@ def speak(message, text):
 
 
 def main():
+    random.seed()
     bot = Bot()
     bot.run()
 
