@@ -343,7 +343,7 @@ def markov(message):
 
     response = markov.text_model.make_sentence(tries=1024)
 
-    message.reply(response)
+    message.send(response)
 
 
 @listen_to(r'^status$')
