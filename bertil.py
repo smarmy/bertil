@@ -338,10 +338,23 @@ def markov(message):
         for user in user_messages:
             messages += '\n'.join(user_messages[user])
 
-        markov.text_model = markovify.NewlineText(messages,
-                                                  state_size=random.randint(2, 4))
+        markov.text_models = [markovify.NewlineText(messages, state_size=i) for i in (2, 3, 4)]
 
-    response = markov.text_model.make_sentence(tries=1024)
+    text_model = random.choice(markov.text_models)
+    response = text_model.make_sentence(tries=1024)
+
+    message.send(response)
+
+
+@listen_to(r'^markovmat$')
+def markov_mat(message):
+    if not hasattr(markov_mat, "text_model"):
+        with open('/home/simon/bertil/mat.txt') as file_:
+            mat_text = file_.read()
+
+        markov_mat.text_model = markovify.NewlineText(mat_text)
+
+    response = markov_mat.text_model.make_sentence(tries=1024)
 
     message.send(response)
 
