@@ -338,11 +338,9 @@ def markov(message):
         for user in user_messages:
             messages += '\n'.join(user_messages[user])
 
-        markov.text_models = [markovify.NewlineText(messages, state_size=i) for i in (2, 3, 4)]
+        markov.text_model = markovify.NewlineText(messages, state_size=3)
 
-    text_model = random.choice(markov.text_models)
-    response = text_model.make_sentence(tries=1024)
-
+    response = markov.text_model.make_sentence(tries=1024)
     message.send(response)
 
 
@@ -355,7 +353,6 @@ def markov_mat(message):
         markov_mat.text_model = markovify.NewlineText(mat_text)
 
     response = markov_mat.text_model.make_sentence(tries=1024)
-
     message.send(response)
 
 
