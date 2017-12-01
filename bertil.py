@@ -328,9 +328,10 @@ def matte(message, math_string):
 
 
 @default_reply
+@listen_to(r'bertil')
 def markov(message):
     if not hasattr(markov, "text_model"):
-        with open('user_messages.json') as file_:
+        with open('/home/simon/bertil/user_messages.json') as file_:
             user_messages = json.load(file_)
 
         messages = ''
