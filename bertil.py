@@ -335,8 +335,8 @@ def markov(message):
             user_messages = json.load(file_)
 
         messages = ''
-        for _ in user_messages:
-            messages += '\n'.join(messages)
+        for user in user_messages:
+            messages += '\n'.join(user_messages[user])
 
         markov.text_model = markovify.NewlineText(messages,
                                                   state_size=random.randint(2, 4))
