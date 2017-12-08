@@ -364,7 +364,7 @@ def markorv_mat(message):
 
         markov_mat.text_model = markovify.NewlineText(mat_text, state_size=1)
 
-    response = markov_mat.text_model.make_sentence_with_start("korv",
+    response = markov_mat.text_model.make_sentence_with_start("Korv",
                                                               strict=False,
                                                               tries=1024)
     message.send(response)
