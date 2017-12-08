@@ -350,9 +350,23 @@ def markov_mat(message):
         with open('/home/simon/bertil/mat.txt') as file_:
             mat_text = file_.read()
 
-        markov_mat.text_model = markovify.NewlineText(mat_text)
+        markov_mat.text_model = markovify.NewlineText(mat_text, state_size=1)
 
     response = markov_mat.text_model.make_sentence(tries=1024)
+    message.send(response)
+
+
+@listen_to(r'^markorvmat$')
+def markorv_mat(message):
+    if not hasattr(markov_mat, "text_model"):
+        with open('/home/simon/bertil/mat.txt') as file_:
+            mat_text = file_.read()
+
+        markov_mat.text_model = markovify.NewlineText(mat_text, state_size=1)
+
+    response = markov_mat.text_model.make_sentence_with_start("korv",
+                                                              strict=False,
+                                                              tries=1024)
     message.send(response)
 
 
