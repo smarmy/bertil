@@ -329,7 +329,12 @@ def matte(message, math_string):
 
 @default_reply
 @listen_to(r'bertil')
-def markov(message):
+def bertil(message):
+    markov(message, None)
+
+
+@listen_to(r'^markov\s(.*)$')
+def markov(message, stuff):
     if not hasattr(markov, "text_model"):
         with open('/home/simon/bertil/user_messages.json') as file_:
             user_messages = json.load(file_)
@@ -340,8 +345,19 @@ def markov(message):
 
         markov.text_model = markovify.NewlineText(messages, state_size=3)
 
-    response = markov.text_model.make_sentence(tries=1024)
-    message.send(response)
+    if stuff:
+        response = ""
+        for _ in range(1024):
+            response = markov.text_model.make_sentence(tries=1024)
+            if stuff.lower() in response.lower():
+                message.send(response)
+                return
+
+        message.send("Jag kommer inte på något att säga med {} :rip:".format(stuff))
+
+    else:
+        response = markov.text_model.make_sentence(tries=1024)
+        message.send(response)
 
 
 @listen_to(r'^markovmat\s*(.*)$')
@@ -350,19 +366,17 @@ def markov_mat(message, stuff):
         with open('/home/simon/bertil/mat.txt') as file_:
             mat_text = file_.read()
 
-        mat_text = mat_text.lower()
         markov_mat.text_model = markovify.NewlineText(mat_text, state_size=1)
 
     if stuff:
-        stuff = stuff.lower()
         response = ""
         for _ in range(1024):
             response = markov_mat.text_model.make_sentence(tries=1024)
-            if stuff in response:
+            if stuff.lower() in response.lower():
                 message.send(response)
                 return
 
-        message.send("Jag kan inte komma på en maträtt med {} :rip:".format(stuff))
+        message.send("Jag kunde inte hitta på en maträtt med {} :rip:".format(stuff))
 
     else:
         response = markov_mat.text_model.make_sentence(tries=1024)
