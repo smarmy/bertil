@@ -333,7 +333,7 @@ def bertil(message):
     markov(message, None)
 
 
-@listen_to(r'^markov\s(.*)$')
+@listen_to(r'^markov\s*(.*)$')
 def markov(message, stuff):
     if not hasattr(markov, "text_model"):
         with open('/home/simon/bertil/user_messages.json') as file_:
