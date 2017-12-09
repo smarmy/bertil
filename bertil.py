@@ -347,8 +347,10 @@ def markov(message, stuff):
 
     if stuff:
         response = ""
-        for _ in range(1024):
-            response = markov.text_model.make_sentence(tries=1024)
+        for _ in range(64):
+            response = markov.text_model.make_sentence(tries=64)
+            if not response:
+                continue
             if stuff.lower() in response.lower():
                 message.send(response)
                 return
@@ -356,8 +358,11 @@ def markov(message, stuff):
         message.send("Jag kommer inte på något att säga med {} :rip:".format(stuff))
 
     else:
-        response = markov.text_model.make_sentence(tries=1024)
-        message.send(response)
+        response = markov.text_model.make_sentence(tries=64)
+        if not response:
+            message.send("Jag lyckades inte generera en mening :rip:")
+        else:
+            message.send(response)
 
 
 @listen_to(r'^markovmat\s*(.*)$')
@@ -370,8 +375,10 @@ def markov_mat(message, stuff):
 
     if stuff:
         response = ""
-        for _ in range(1024):
-            response = markov_mat.text_model.make_sentence(tries=1024)
+        for _ in range(512):
+            response = markov_mat.text_model.make_sentence(tries=64)
+            if not response:
+                continue
             if stuff.lower() in response.lower():
                 message.send(response)
                 return
@@ -379,8 +386,11 @@ def markov_mat(message, stuff):
         message.send("Jag kunde inte hitta på en maträtt med {} :rip:".format(stuff))
 
     else:
-        response = markov_mat.text_model.make_sentence(tries=1024)
-        message.send(response)
+        response = markov_mat.text_model.make_sentence(tries=64)
+        if not response:
+            message.send("Jag lyckades inte generera en mening :rip:")
+        else:
+            message.send(response)
 
 
 @listen_to(r'^status$')
