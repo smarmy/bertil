@@ -92,7 +92,7 @@ def mat(message, plus, restaurant):
                                                                     what=str(exception)))
 
 
-@listen_to(r'^youtube(.*)')
+@listen_to(r'^youtube\s*(.*)')
 def youtube(message, query):
     developer_key = bertil_secrets.YOUTUBE_API_KEY
     youtube_api_service_name = 'youtube'
@@ -344,30 +344,29 @@ def markov(message):
     message.send(response)
 
 
-@listen_to(r'^markovmat$')
-def markov_mat(message):
+@listen_to(r'^markovmat\s*(.*)$')
+def markov_mat(message, stuff):
     if not hasattr(markov_mat, "text_model"):
         with open('/home/simon/bertil/mat.txt') as file_:
             mat_text = file_.read()
 
+        mat_text = mat_text.lower()
         markov_mat.text_model = markovify.NewlineText(mat_text, state_size=1)
 
-    response = markov_mat.text_model.make_sentence(tries=1024)
-    message.send(response)
+    if stuff:
+        stuff = stuff.lower()
+        response = ""
+        for _ in range(1024):
+            response = markov_mat.text_model.make_sentence(tries=1024)
+            if stuff in response:
+                message.send(response)
+                return
 
+        message.send("Jag kan inte komma på en maträtt med {} :rip:".format(stuff))
 
-@listen_to(r'^markorvmat$')
-def markorv_mat(message):
-    if not hasattr(markov_mat, "text_model"):
-        with open('/home/simon/bertil/mat.txt') as file_:
-            mat_text = file_.read()
-
-        markov_mat.text_model = markovify.NewlineText(mat_text, state_size=1)
-
-    response = markov_mat.text_model.make_sentence_with_start("Korv",
-                                                              strict=False,
-                                                              tries=1024)
-    message.send(response)
+    else:
+        response = markov_mat.text_model.make_sentence(tries=1024)
+        message.send(response)
 
 
 @listen_to(r'^status$')
