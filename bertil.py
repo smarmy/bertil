@@ -329,11 +329,12 @@ def matte(message, math_string):
 
 @default_reply
 @listen_to(r'bertil')
+@listen_to(r'^markov$')
 def bertil(message):
     markov(message, None)
 
 
-@listen_to(r'^markov\s*(.*)$')
+@listen_to(r'^markov (\S+)$')
 def markov(message, stuff):
     if not hasattr(markov, "text_model"):
         with open('/home/simon/bertil/user_messages.json') as file_:
@@ -347,7 +348,7 @@ def markov(message, stuff):
 
     if stuff:
         response = ""
-        for _ in range(64):
+        for _ in range(512):
             response = markov.text_model.make_sentence(tries=64)
             if not response:
                 continue
@@ -365,8 +366,13 @@ def markov(message, stuff):
             message.send(response)
 
 
-@listen_to(r'^markovmat\s*(.*)$')
-def markov_mat(message, stuff):
+@listen_to(r'^markovmat$')
+def markov_mat(message):
+    markov_mat_stuff(message, None)
+
+
+@listen_to(r'^markovmat (\S+)$')
+def markov_mat_stuff(message, stuff):
     if not hasattr(markov_mat, "text_model"):
         with open('/home/simon/bertil/mat.txt') as file_:
             mat_text = file_.read()
