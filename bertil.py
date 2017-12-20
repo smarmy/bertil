@@ -347,16 +347,12 @@ def markov(message, stuff):
         markov.text_model = markovify.NewlineText(messages, state_size=3)
 
     if stuff:
-        response = ""
-        for _ in range(512):
-            response = markov.text_model.make_sentence(tries=64)
-            if not response:
-                continue
-            if stuff.lower() in response.lower():
-                message.send(response)
-                return
-
-        message.send("Jag kommer inte på något att säga med {} :rip:".format(stuff))
+        try:
+            response = markov.text_model.make_sentence_with_start(stuff, False, tries=64)
+            message.send(response)
+            return
+        except Exception as exception:
+            message.send("Jag kommer inte på något att säga med {} :rip:".format(stuff))
 
     else:
         response = markov.text_model.make_sentence(tries=64)
