@@ -16,10 +16,10 @@ from tinydb import TinyDB, Query
 from apiclient.discovery import build
 from apiclient.errors import HttpError
 
+import markovify
+
 import utils
 import bertil_secrets
-
-import markovify
 
 @listen_to(r'^help$')
 def bertil_help(message):
