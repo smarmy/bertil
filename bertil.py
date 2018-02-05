@@ -26,7 +26,6 @@ def bertil_help(message):
     func_names = [p.pattern for p, _ in PluginsManager.commands['listen_to'].items()]
     message.reply('Jag kan följade kommandon:\n```{}```'.format('\n'.join(func_names)))
 
-
 @listen_to(r'^veckans mat(\s*konst)?$')
 def veckans_mat(message, restaurant):
     if restaurant is None:
@@ -61,18 +60,15 @@ def veckans_mat(message, restaurant):
     else:
         message.reply("Hittade ingen mat.")
 
-
 @listen_to(r'^vecka$')
 def vecka(message):
     week = datetime.datetime.now().isocalendar()[1]
     message.reply("Vecka {}".format(week))
 
-
 @listen_to(r'^datum$')
 def datum(message):
     date = datetime.datetime.now().strftime('%Y-%m-%d')
     message.reply("{}".format(date))
-
 
 @listen_to(r'^mat(\+*)(\s*konst)?$')
 def mat(message, plus, restaurant):
@@ -90,7 +86,6 @@ def mat(message, plus, restaurant):
     except Exception as exception:
         message.reply("Kom inte åt maten från {} 😞 ({what})".format(restaurant,
                                                                     what=str(exception)))
-
 
 @listen_to(r'^youtube\s*(.*)')
 def youtube(message, query):
@@ -123,7 +118,6 @@ def youtube(message, query):
 
     message.reply('{}'.format('\n'.join(videos)))
 
-
 @listen_to(r'^[e\u00E4\u00C4]r.*m\u00E5ndag.*\?', re.IGNORECASE)
 def mondag(message):
     if datetime.datetime.today().weekday() == 4:
@@ -133,7 +127,6 @@ def mondag(message):
     else:
         message.reply("Nä")
 
-
 @listen_to(r'^[e\u00E4\u00C4]r.*fredag.*\?', re.IGNORECASE)
 def fredag(message):
     if datetime.datetime.today().weekday() == 4:
@@ -141,11 +134,9 @@ def fredag(message):
     else:
         message.reply("Nej, idag är det INTE fredag! :qq::gun:")
 
-
 @listen_to(r'^n[\u00E4\u00C4]r.*hem.*\?', re.IGNORECASE)
 def hem(message):
     message.reply("Det är väl bara att gå")
-
 
 @listen_to(r'^n[\u00E4\u00C4]r.*helg.*\?', re.IGNORECASE)
 def whenhelg(message):
@@ -190,13 +181,11 @@ def temp(message):
     current_time, current_temp = response_str[:len(response_str) - 1].split('=')
     message.reply("{} C klockan {}".format(current_temp, current_time))
 
-
 @listen_to(r'^quote add (.*)$')
 def quote_add(message, quote):
     tdb = TinyDB('/home/simon/bertil/quotes.json')
     tdb.insert({'quote': quote})
     message.reply("Quote inlagd!")
-
 
 @listen_to(r'^quote remove (.*)$')
 def quote_remove(message, quote):
@@ -207,7 +196,6 @@ def quote_remove(message, quote):
         message.reply("Tog bort {quote}.".format(quote=quote))
     else:
         message.reply("?")
-
 
 @listen_to(r'^quote find (.*)$')
 def quote_find(message, quote_regex):
@@ -223,7 +211,6 @@ def quote_find(message, quote_regex):
     except Exception as exception:
         message.reply("Vad sysslar du med?! ({err})".format(err=str(exception)))
 
-
 @listen_to(r'^quote$')
 def get_random_quote(message):
     tdb = TinyDB('/home/simon/bertil/quotes.json')
@@ -233,7 +220,6 @@ def get_random_quote(message):
     else:
         quote = random.choice(quotes)
         message.reply("```{}```".format(quote['quote']))
-
 
 @listen_to(r'^so (.*)$')
 def stackoverflow(message, query):
@@ -280,7 +266,6 @@ def stackoverflow(message, query):
 
     message.reply("{}".format(reply))
 
-
 @listen_to(r'^fika(\+*)$')
 def fika(message, plus):
     fikalistan = [
@@ -318,20 +303,17 @@ def ica(message):
 
     message.reply('Hittade ingen lunch :-(')
 
-
 @listen_to(r'^\$(.*)')
 def matte(message, math_string):
     string = urllib.parse.quote_plus(math_string)
     string = requests.get("http://api.mathjs.org/v1/?expr={}".format(string)).text
     message.reply(string)
 
-
 @default_reply
 @listen_to(r'bertil')
 @listen_to(r'^markov$')
 def bertil(message):
     markov(message, None)
-
 
 @listen_to(r'^markov (\S+)$')
 def markov(message, stuff):
@@ -350,7 +332,7 @@ def markov(message, stuff):
             response = markov.text_model.make_sentence_with_start(stuff, False, tries=64)
             message.send(response)
             return
-        except Exception as exception:
+        except Exception:
             message.send("Jag kommer inte på något att säga med {} :rip:".format(stuff))
 
     else:
@@ -360,11 +342,9 @@ def markov(message, stuff):
         else:
             message.send(response)
 
-
 @listen_to(r'^markovmat$')
 def markov_mat(message):
     markov_mat_stuff(message, None)
-
 
 @listen_to(r'^markovmat (\S+)$')
 def markov_mat_stuff(message, stuff):
@@ -393,19 +373,16 @@ def markov_mat_stuff(message, stuff):
         else:
             message.send(response)
 
-
 @listen_to(r'^status$')
 def status(message):
     result = subprocess.run(['ssh', 'gamma', '/home/simon/status/status.sh'],
                             stdout=subprocess.PIPE)
     message.reply("```{}```".format(result.stdout.decode('ascii')))
 
-
 @respond_to(r'^help$')
 def bertil_private_help(message):
     func_names = [p.pattern for p, _ in PluginsManager.commands['respond_to'].items()]
     message.reply('Jag kan följade kommandon:\n```{}```'.format('\n'.join(func_names)))
-
 
 @respond_to(r'^s\u00E4g (.*)$')
 def speak(message, text):
@@ -413,12 +390,10 @@ def speak(message, text):
     message.body['channel'] = 'C2R7P4B8B'
     message.send(text)
 
-
 def main():
     random.seed()
     bot = Bot()
     bot.run()
-
 
 if __name__ == '__main__':
     main()
