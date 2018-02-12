@@ -1,6 +1,7 @@
 import datetime
 import json
 import requests
+from html.parser import HTMLParser
 
 def fetch_food_json():
     response = requests.get('http://www.hanssonohammar.se/veckansmeny.json').text
@@ -100,3 +101,32 @@ def is_squeeze_day(weekday_index, week_json):
 # Returns True if day is Workfree, False otherwise
 def is_workfree_day(day):
     return day['arbetsfri dag'] == 'Ja'
+
+def majestic():
+    class Parser(HTMLParser):
+
+        def __init__(self):
+            super().__init__()
+            self.current_tag = []
+            self.result = []
+
+        def handle_starttag(self, tag, attrs):
+            self.current_tag.append((tag, attrs))
+
+        def handle_endtag(self, tag):
+            self.current_tag.pop()
+
+        def handle_data(self, data):
+            if self.current_tag:
+                tag, attrs = self.current_tag[-1]
+                if tag == 'div':
+                    for k, v in attrs:
+                        if k == 'class' and v == 'menu':
+                            tmp = data.strip()
+                            if tmp:
+                                self.result.append(tmp)
+
+    r = requests.get('http://mega.vk.se/lunchguiden/?view=restaurant&id=204')
+    p = Parser()
+    p.feed(r.text)
+    return p.result
