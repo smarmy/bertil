@@ -127,6 +127,7 @@ def majestic():
                                 self.result.append(tmp)
 
     r = requests.get('http://mega.vk.se/lunchguiden/?view=restaurant&id=204')
+    r.encoding = "UTF-8"
     p = Parser()
     p.feed(r.text)
     return p.result
