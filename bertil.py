@@ -150,20 +150,22 @@ def hem(message):
 @listen_to(r'^n[\u00E4\u00C4]r.*helg.*\?', re.IGNORECASE)
 def whenhelg(message):
     today = datetime.datetime.now()
+    if today.weekday() == 5 or today.weekday() == 6:
+        message.reply('Det är ju redan helg! :kreygasm:')
+        return
+
     week = utils.get_current_swedish_week()
     days = 0
 
-    for day in week[today.weekday():len(week)]:
+    for day in week[today.weekday()+1:len(week)]:
         day_index = int(day['dag i vecka']) - 1
         if (not utils.is_workfree_day(day) and not
                 utils.is_squeeze_day(day_index, week)):
             days += 1
 
-    hours = 0
-    if today.hour < 8 or today.hour > 17:
-        days -= 1
-    else:
-        hours = 17 - today.hour
+    hours = 17 - today.hour
+    if hours < 0:
+        hours = 0
 
     reactions = [':kreygasm:',
                  ':relieved:',
@@ -172,13 +174,10 @@ def whenhelg(message):
                  ':disappointed::noose:',
                 ]
 
-    if days <= 0 and hours == 0:
-        message.reply('Det är ju redan helg! :kreygasm:')
-    else:
-        message.reply('Det är {days} dagar och {hours} timmar kvar till' \
-                      'helgen... {reaction}'.format(days=days,
-                                                    hours=hours,
-                                                    reaction=reactions[days]))
+    message.reply('Det är {days} dagar och {hours} timmar kvar till' \
+                    'helgen... {reaction}'.format(days=days,
+                                                hours=hours,
+                                                reaction=reactions[days]))
 
 @listen_to(r'^temp$')
 def temp(message):
