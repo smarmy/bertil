@@ -169,15 +169,15 @@ def whenhelg(message):
 
     reactions = [':kreygasm:',
                  ':relieved:',
-                 ':neutral_face:'
+                 ':neutral_face:',
                  ':disappointed::gun:',
                  ':disappointed::noose:',
                 ]
 
     message.reply('Det är {days} dagar och {hours} timmar kvar till' \
                     'helgen... {reaction}'.format(days=days,
-                                                hours=hours,
-                                                reaction=reactions[days]))
+                                                  hours=hours,
+                                                  reaction=reactions[days]))
 
 @listen_to(r'^temp$')
 def temp(message):
