@@ -87,14 +87,11 @@ def mat(message, plus, restaurant):
         message.reply("Kom inte åt maten från {} 😞 ({what})".format(restaurant,
                                                                     what=str(exception)))
 
-@listen_to(r'^maj$')
-def majestic(message):
-    menu = utils.majestic()
-    if menu:
-        menu_str = '\n'.join(menu)
-        message.reply("```Majestic\n{}```".format(menu_str))
-    else:
-        message.reply("Jag kunde inte parsa Lunchguiden :rip:")
+@listen_to(r'^maj(\+*)$')
+def majestic(message, plus):
+    date = datetime.date.fromtimestamp(time.time() + (86400 * len(plus)))
+    reply = utils.majestic(str(date))
+    message.reply("```{}```".format(reply))
 
 @listen_to(r'^youtube\s*(.*)')
 def youtube(message, query):
