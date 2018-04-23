@@ -176,7 +176,7 @@ def whenhelg(message):
                                                   hours=hours,
                                                   reaction=reactions[days]))
 
-@listen_to(r'^temp$')
+@listen_to(r'^temp|Temp$')
 def temp(message):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect(('temp.acc.umu.se', 2345))
