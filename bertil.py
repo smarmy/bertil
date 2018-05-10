@@ -7,6 +7,7 @@ import random
 import subprocess
 import json
 import requests
+import xml.etree.ElementTree as ET  # phone home
 
 from slackbot.bot import Bot, listen_to, respond_to, default_reply
 from slackbot.manager import PluginsManager
@@ -185,6 +186,24 @@ def temp(message):
     response_str = response.decode('ascii')
     current_time, current_temp = response_str[:len(response_str) - 1].split('=')
     message.reply("{} C klockan {}".format(current_temp, current_time))
+
+@listen_to(r'^temp idag$')
+def temp_idag(message):
+    def weekday(timestr):
+        return datetime.datetime.strptime(timestr, '%Y-%m-%dT%H:%M:%S').weekday()
+    umea = 'https://www.yr.no/sted/Sverige/V%C3%A4sterbotten/Ume%C3%A5/forecast_hour_by_hour.xml'
+    today = datetime.date.today().weekday()
+    data = requests.get(umea).text
+    root = ET.fromstring(data)
+    temps = []
+    tabular = root.find('forecast').find('tabular')
+    for time in tabular.iter('time'):
+        start_time = time.attrib['from']
+        end_time = time.attrib['to']
+        if weekday(start_time) == today and weekday(end_time) == today:
+            temperature = time.find('temperature')
+            temps.append(temperature.attrib['value'])
+    message.reply(','.join([str(x) for x in temps]))
 
 @listen_to(r'^quote add (.*)$')
 def quote_add(message, quote):
