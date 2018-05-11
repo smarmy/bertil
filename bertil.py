@@ -189,21 +189,49 @@ def temp(message):
 
 @listen_to(r'^temp idag$')
 def temp_idag(message):
+    def parsetime(timestr):
+        return datetime.datetime.strptime(timestr, '%Y-%m-%dT%H:%M:%S')
+    def hour(timestr):
+        return parsetime(timestr).hour
     def weekday(timestr):
-        return datetime.datetime.strptime(timestr, '%Y-%m-%dT%H:%M:%S').weekday()
+        return parsetime(timestr).weekday()
+
     umea = 'https://www.yr.no/sted/Sverige/V%C3%A4sterbotten/Ume%C3%A5/forecast_hour_by_hour.xml'
     today = datetime.date.today().weekday()
     data = requests.get(umea).text
     root = ET.fromstring(data)
     temps = []
+    temps_dict = {}
+    
     tabular = root.find('forecast').find('tabular')
     for time in tabular.iter('time'):
         start_time = time.attrib['from']
         end_time = time.attrib['to']
-        if weekday(start_time) == today and weekday(end_time) == today:
-            temperature = time.find('temperature')
-            temps.append(temperature.attrib['value'])
-    message.reply(','.join([str(x) for x in temps]))
+        end_hour = hour(start_time)
+        if len(temps_dict) < 12 or (weekday(start_time) == today and weekday(end_time) == today):
+            temperature = int(time.find('temperature').attrib['value'])
+            temps.append(temperature)
+            temps_dict[end_hour] = temperature
+    
+    lower_bound = min(temps) - 2
+    upper_bound = max(temps) + 2
+    lines = []
+    for temperature in reversed(range(lower_bound, upper_bound + 1)):
+        line = '%2d\u2502' % temperature
+        for hour in temps_dict:
+            if temps_dict[hour] >= temperature:
+                line += '\u2593\u2588 '
+            else:
+                line += '   '
+        lines.append(line)
+
+    lines.append('  \u2514' + '\u2500\u2500\u2500' * len(temps_dict))
+
+    hour_line = '   '
+    for hour in temps_dict:
+        hour_line += '%02d ' % hour
+    lines.append(hour_line)
+    message.reply('```{}```'.format('\n'.join(lines)))
 
 @listen_to(r'^quote add (.*)$')
 def quote_add(message, quote):
