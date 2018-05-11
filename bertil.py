@@ -191,7 +191,7 @@ def temp(message):
 def temp_idag(message):
     def parsetime(timestr):
         return datetime.datetime.strptime(timestr, '%Y-%m-%dT%H:%M:%S')
-    def hour(timestr):
+    def get_hour(timestr):
         return parsetime(timestr).hour
     def weekday(timestr):
         return parsetime(timestr).weekday()
@@ -201,34 +201,34 @@ def temp_idag(message):
     data = requests.get(umea).text
     root = ET.fromstring(data)
     temps = []
-    temps_dict = {}
+    hours = []
     
     tabular = root.find('forecast').find('tabular')
     for time in tabular.iter('time'):
         start_time = time.attrib['from']
         end_time = time.attrib['to']
-        end_hour = hour(start_time)
-        if len(temps_dict) < 12 or (weekday(start_time) == today and weekday(end_time) == today):
+        hour = get_hour(start_time)
+        if len(hours) < 12 or (weekday(start_time) == today and weekday(end_time) == today):
             temperature = int(time.find('temperature').attrib['value'])
             temps.append(temperature)
-            temps_dict[end_hour] = temperature
+            hours.append((hour, temperature))
     
     lower_bound = min(temps) - 2
     upper_bound = max(temps) + 2
     lines = []
     for temperature in reversed(range(lower_bound, upper_bound + 1)):
-        line = '%2d\u2502' % temperature
-        for hour in temps_dict:
-            if temps_dict[hour] >= temperature:
-                line += '\u2593\u2588 '
+        line = '%2d|' % temperature
+        for _, temp in hours:
+            if temp >= temperature:
+                line += '## '
             else:
                 line += '   '
         lines.append(line)
 
-    lines.append('  \u2514' + '\u2500\u2500\u2500' * len(temps_dict))
+    lines.append('  +' + '---' * len(hours))
 
     hour_line = '   '
-    for hour in temps_dict:
+    for hour, _ in hours:
         hour_line += '%02d ' % hour
     lines.append(hour_line)
     message.reply('```{}```'.format('\n'.join(lines)))
