@@ -208,7 +208,7 @@ def temp_idag(message):
         start_time = time.attrib['from']
         end_time = time.attrib['to']
         hour = get_hour(start_time)
-        if len(hours) < 12 or (weekday(start_time) == today and weekday(end_time) == today):
+        if len(hours) < 8:
             temperature = int(time.find('temperature').attrib['value'])
             temps.append(temperature)
             hours.append((hour, temperature))
