@@ -233,6 +233,52 @@ def temp_idag(message):
     lines.append(hour_line)
     message.reply('```{}```'.format('\n'.join(lines)))
 
+@listen_to(r'^temp imorn$')
+def temp_imorn(message):
+    def parsetime(timestr):
+        return datetime.datetime.strptime(timestr, '%Y-%m-%dT%H:%M:%S')
+    def get_hour(timestr):
+        return parsetime(timestr).hour
+    def weekday(timestr):
+        return parsetime(timestr).weekday()
+
+    umea = 'https://www.yr.no/sted/Sverige/V%C3%A4sterbotten/Ume%C3%A5/forecast_hour_by_hour.xml'
+    today = (datetime.date.today().weekday() + 1) % 7
+    data = requests.get(umea).text
+    root = ET.fromstring(data)
+    temps = []
+    hours = []
+    
+    tabular = root.find('forecast').find('tabular')
+    for time in tabular.iter('time'):
+        start_time = time.attrib['from']
+        end_time = time.attrib['to']
+        hour = get_hour(start_time)
+        if hour >= 6 and len(hours) < 12:
+            temperature = int(time.find('temperature').attrib['value'])
+            temps.append(temperature)
+            hours.append((hour, temperature))
+    
+    lower_bound = min(temps) - 2
+    upper_bound = max(temps) + 2
+    lines = []
+    for temperature in reversed(range(lower_bound, upper_bound + 1)):
+        line = '%2d|' % temperature
+        for _, temp in hours:
+            if temp >= temperature:
+                line += '## '
+            else:
+                line += '   '
+        lines.append(line)
+
+    lines.append('  +' + '---' * len(hours))
+
+    hour_line = '   '
+    for hour, _ in hours:
+        hour_line += '%02d ' % hour
+    lines.append(hour_line)
+    message.reply('```{}```'.format('\n'.join(lines)))
+    
 @listen_to(r'^quote add (.*)$')
 def quote_add(message, quote):
     tdb = TinyDB('/home/simon/bertil/quotes.json')
