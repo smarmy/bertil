@@ -254,7 +254,8 @@ def temp_imorn(message):
         start_time = time.attrib['from']
         end_time = time.attrib['to']
         hour = get_hour(start_time)
-        if hour >= 6 and hour <= 18:
+        day = weekday(start_time)
+        if day == today and hour >= 6 and hour <= 18:
             temperature = int(time.find('temperature').attrib['value'])
             temps.append(temperature)
             hours.append((hour, temperature))
