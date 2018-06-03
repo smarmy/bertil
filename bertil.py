@@ -279,7 +279,32 @@ def temp_imorn(message):
         hour_line += '%02d ' % hour
     lines.append(hour_line)
     message.reply('```{}```'.format('\n'.join(lines)))
-    
+
+@listen_to(r'^v\u00E4der')
+def weather(message):
+    def wind(mps):
+        if mps <= 0.2: return 'lugnt'
+        if mps <= 1.5: return 'svag vind'
+        if mps <= 3.3: return 'svag vind'
+        if mps <= 5.4: return 'måttlig vind'
+        if mps <= 7.9: return 'måttlig vind'
+        if mps <= 10.7: return 'frisk vind'
+        if mps <= 13.8: return 'frisk vind'
+        if mps <= 17.1: return 'hård vind'
+        if mps <= 20.7: return 'hård vind'
+        if mps <= 24.4: return 'mycket hård vind'
+        if mps <= 28.4: return 'storm'
+        if mps <= 32.6: return 'svår storm'
+        return 'orkan'
+    umea = 'https://www.yr.no/sted/Sverige/V%C3%A4sterbotten/Ume%C3%A5/forecast_hour_by_hour.xml'
+    data = requests.get(umea).text
+    root = ET.fromstring(data)
+    time_tag = root.find('forecast').find('tabular').find('time')
+    precip = float(time_tag.find('precipitation').attrib['value'])
+    wind_speed = float(time_tag.find('windSpeed').attrib['mps'])
+    temperature = time_tag.find('temperature').attrib['value']
+    message.reply('{}% chans för regn\n{} ({} m/s)\n{} C'.format(precip, wind(wind_speed), wind_speed, temperature))
+
 @listen_to(r'^quote add (.*)$')
 def quote_add(message, quote):
     tdb = TinyDB('/home/simon/bertil/quotes.json')
